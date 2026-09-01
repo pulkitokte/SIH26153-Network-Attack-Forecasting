@@ -1,0 +1,29 @@
+CICIDS2017 - GRU DDoS FORECASTING REPORT
+===========================================================================
+
+Architecture: 2-layer GRU
+Input: 100 flows × 68 features
+Target: DDoS in next 100 flows
+
+Best validation loss: 0.235931
+Selected threshold: 0.65
+
+Confusion Matrix:
+[[213  30]
+ [  0  30]]
+
+              precision    recall  f1-score   support
+
+     No DDoS       1.00      0.88      0.93       243
+        DDoS       0.50      1.00      0.67        30
+
+    accuracy                           0.89       273
+   macro avg       0.75      0.94      0.80       273
+weighted avg       0.95      0.89      0.90       273
+
+ROC-AUC: 0.944444
+PR-AUC: 0.536974
+Precision: 0.500000
+Recall: 1.000000
+F1: 0.666667
+False Alarm Rate: 0.123457

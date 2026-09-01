@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-navy: #05070d;
+  --color-navy-2: #070b14;
+  --color-surface: #0b1220;
+  --color-panel: #0e1626;
+  --color-line: rgba(148, 211, 255, 0.12);
+  --color-cyan: #22d3ee;
+  --color-cyan-2: #67e8f9;
+  --color-critical: #fb7185;
+  --color-high: #f59e0b;
+  --color-watch: #eab308;
+  --color-safe: #34d399;
+  --color-ink: #e8eef7;
+  --color-mute: #8b9bb4;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #05070d;
+  color: #e8eef7;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.soc-shell {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(34, 211, 238, 0.08), transparent 50%),
+    radial-gradient(900px 420px at 100% 0%, rgba(244, 63, 94, 0.05), transparent 45%),
+    #05070d;
+}
+
+.soc-grid {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.glass {
+  background: rgba(11, 18, 32, 0.78);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(148, 211, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+.glass-strong {
+  background: rgba(8, 13, 24, 0.9);
+  backdrop-filter: blur(22px);
+  border: 1px solid rgba(148, 211, 255, 0.12);
+}
+
+.fade-up {
+  animation: fade-up 0.45s ease both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.75);
+  }
+}
+
+.live-dot {
+  animation: live-pulse 1.8s ease-in-out infinite;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.25) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.22);
+  border-radius: 99px;
+}

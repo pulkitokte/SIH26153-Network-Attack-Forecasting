@@ -1,0 +1,131 @@
+===========================================================================
+CICIDS2017 - DDoS SEQUENCE / LABEL BOUNDARY ANALYSIS
+===========================================================================
+
+Total rows: 225,745
+Total contiguous label regions: 45
+
+LABEL RUNS
+---------------------------------------------------------------------------
+001. BENIGN     start=0        end=18,882   length=18,883
+002. DDoS       start=18,883   end=21,320   length=2,438
+003. BENIGN     start=21,321   end=22,548   length=1,228
+004. DDoS       start=22,549   end=30,792   length=8,244
+005. BENIGN     start=30,793   end=33,340   length=2,548
+006. DDoS       start=33,341   end=39,916   length=6,576
+007. BENIGN     start=39,917   end=43,054   length=3,138
+008. DDoS       start=43,055   end=49,661   length=6,607
+009. BENIGN     start=49,662   end=52,557   length=2,896
+010. DDoS       start=52,558   end=59,090   length=6,533
+011. BENIGN     start=59,091   end=61,687   length=2,597
+012. DDoS       start=61,688   end=68,664   length=6,977
+013. BENIGN     start=68,665   end=70,965   length=2,301
+014. DDoS       start=70,966   end=77,854   length=6,889
+015. BENIGN     start=77,855   end=79,325   length=1,471
+016. DDoS       start=79,326   end=86,103   length=6,778
+017. BENIGN     start=86,104   end=88,116   length=2,013
+018. DDoS       start=88,117   end=94,480   length=6,364
+019. BENIGN     start=94,481   end=96,211   length=1,731
+020. DDoS       start=96,212   end=102,484  length=6,273
+021. BENIGN     start=102,485  end=104,756  length=2,272
+022. DDoS       start=104,757  end=110,710  length=5,954
+023. BENIGN     start=110,711  end=110,942  length=232
+024. DDoS       start=110,943  end=110,945  length=3
+025. BENIGN     start=110,946  end=112,980  length=2,035
+026. DDoS       start=112,981  end=119,033  length=6,053
+027. BENIGN     start=119,034  end=121,793  length=2,760
+028. DDoS       start=121,794  end=128,098  length=6,305
+029. BENIGN     start=128,099  end=130,711  length=2,613
+030. DDoS       start=130,712  end=137,177  length=6,466
+031. BENIGN     start=137,178  end=139,874  length=2,697
+032. DDoS       start=139,875  end=146,138  length=6,264
+033. BENIGN     start=146,139  end=148,420  length=2,282
+034. DDoS       start=148,421  end=154,720  length=6,300
+035. BENIGN     start=154,721  end=157,853  length=3,133
+036. DDoS       start=157,854  end=164,405  length=6,552
+037. BENIGN     start=164,406  end=166,728  length=2,323
+038. DDoS       start=166,729  end=173,131  length=6,403
+039. BENIGN     start=173,132  end=177,906  length=4,775
+040. DDoS       start=177,907  end=184,341  length=6,435
+041. BENIGN     start=184,342  end=187,180  length=2,839
+042. DDoS       start=187,181  end=193,445  length=6,265
+043. BENIGN     start=193,446  end=196,194  length=2,749
+044. DDoS       start=196,195  end=197,542  length=1,348
+045. BENIGN     start=197,543  end=225,744  length=28,202
+
+DDoS REGIONS
+---------------------------------------------------------------------------
+DDoS region 1: rows 18,883 → 21,320 (2,438 flows)
+DDoS region 2: rows 22,549 → 30,792 (8,244 flows)
+DDoS region 3: rows 33,341 → 39,916 (6,576 flows)
+DDoS region 4: rows 43,055 → 49,661 (6,607 flows)
+DDoS region 5: rows 52,558 → 59,090 (6,533 flows)
+DDoS region 6: rows 61,688 → 68,664 (6,977 flows)
+DDoS region 7: rows 70,966 → 77,854 (6,889 flows)
+DDoS region 8: rows 79,326 → 86,103 (6,778 flows)
+DDoS region 9: rows 88,117 → 94,480 (6,364 flows)
+DDoS region 10: rows 96,212 → 102,484 (6,273 flows)
+DDoS region 11: rows 104,757 → 110,710 (5,954 flows)
+DDoS region 12: rows 110,943 → 110,945 (3 flows)
+DDoS region 13: rows 112,981 → 119,033 (6,053 flows)
+DDoS region 14: rows 121,794 → 128,098 (6,305 flows)
+DDoS region 15: rows 130,712 → 137,177 (6,466 flows)
+DDoS region 16: rows 139,875 → 146,138 (6,264 flows)
+DDoS region 17: rows 148,421 → 154,720 (6,300 flows)
+DDoS region 18: rows 157,854 → 164,405 (6,552 flows)
+DDoS region 19: rows 166,729 → 173,131 (6,403 flows)
+DDoS region 20: rows 177,907 → 184,341 (6,435 flows)
+DDoS region 21: rows 187,181 → 193,445 (6,265 flows)
+DDoS region 22: rows 196,195 → 197,542 (1,348 flows)
+
+LABEL TRANSITIONS
+---------------------------------------------------------------------------
+Row 18,883: BENIGN → DDoS
+Row 21,321: DDoS → BENIGN
+Row 22,549: BENIGN → DDoS
+Row 30,793: DDoS → BENIGN
+Row 33,341: BENIGN → DDoS
+Row 39,917: DDoS → BENIGN
+Row 43,055: BENIGN → DDoS
+Row 49,662: DDoS → BENIGN
+Row 52,558: BENIGN → DDoS
+Row 59,091: DDoS → BENIGN
+Row 61,688: BENIGN → DDoS
+Row 68,665: DDoS → BENIGN
+Row 70,966: BENIGN → DDoS
+Row 77,855: DDoS → BENIGN
+Row 79,326: BENIGN → DDoS
+Row 86,104: DDoS → BENIGN
+Row 88,117: BENIGN → DDoS
+Row 94,481: DDoS → BENIGN
+Row 96,212: BENIGN → DDoS
+Row 102,485: DDoS → BENIGN
+Row 104,757: BENIGN → DDoS
+Row 110,711: DDoS → BENIGN
+Row 110,943: BENIGN → DDoS
+Row 110,946: DDoS → BENIGN
+Row 112,981: BENIGN → DDoS
+Row 119,034: DDoS → BENIGN
+Row 121,794: BENIGN → DDoS
+Row 128,099: DDoS → BENIGN
+Row 130,712: BENIGN → DDoS
+Row 137,178: DDoS → BENIGN
+Row 139,875: BENIGN → DDoS
+Row 146,139: DDoS → BENIGN
+Row 148,421: BENIGN → DDoS
+Row 154,721: DDoS → BENIGN
+Row 157,854: BENIGN → DDoS
+Row 164,406: DDoS → BENIGN
+Row 166,729: BENIGN → DDoS
+Row 173,132: DDoS → BENIGN
+Row 177,907: BENIGN → DDoS
+Row 184,342: DDoS → BENIGN
+Row 187,181: BENIGN → DDoS
+Row 193,446: DDoS → BENIGN
+Row 196,195: BENIGN → DDoS
+Row 197,543: DDoS → BENIGN
+
+DDoS BOUNDARIES
+---------------------------------------------------------------------------
+First DDoS row: 18,883
+Last DDoS row: 197,542

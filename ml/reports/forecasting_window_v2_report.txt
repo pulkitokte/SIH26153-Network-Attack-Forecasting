@@ -1,0 +1,28 @@
+CICIDS2017 - GENUINE EARLY-WARNING WINDOWS V2
+===========================================================================
+
+Observation window: 100 flows
+Forecast horizon: 100 flows
+Step size: 10 flows
+
+Target definition:
+0 = no DDoS in next 100 flows
+1 = DDoS appears in next 100 flows
+
+Total windows: 1,911
+
+Target distribution:
+target
+0    1701
+1     210
+Name: count, dtype: int64
+
+Target distribution by split:
+target            0    1
+dataset_split           
+TEST            243   30
+TRAIN          1215  150
+VALIDATION      243   30
+
+Observation DDoS leakage check:
+Bad windows: 0

@@ -1,0 +1,11 @@
+CICIDS2017 - ISOLATION FOREST SCORE ANALYSIS
+===========================================================================
+
+Episode-level test analysis
+
+ episode_id  pre_attack_mean  attack_mean  score_change  pre_attack_anomaly_pct  attack_anomaly_pct
+         19        -0.100982    -0.084846      0.016136                     5.5                17.7
+         20        -0.121411    -0.107556      0.013854                     1.5                 0.0
+         21        -0.126416    -0.078968      0.047447                     0.5                27.9
+
+Interpretation should focus on whether anomaly scores increase before attack onset and whether attack flows receive higher scores than pre-attack flows.

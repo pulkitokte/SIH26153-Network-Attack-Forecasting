@@ -1,0 +1,324 @@
+===========================================================================
+CICIDS2017 - MULTI-HORIZON SEQUENCE TENSOR VALIDATION
+===========================================================================
+
+This is a read-only validation.
+No tensor, dataset, model, or generator will be modified.
+
+===========================================================================
+LOAD TENSORS
+===========================================================================
+
+Loading multihorizon_X_train.npy
+  shape=(13515, 100, 68)  dtype=float32
+Loading multihorizon_y50_train.npy
+  shape=(13515,)  dtype=int64
+Loading multihorizon_y100_train.npy
+  shape=(13515,)  dtype=int64
+Loading multihorizon_y200_train.npy
+  shape=(13515,)  dtype=int64
+Loading multihorizon_y500_train.npy
+  shape=(13515,)  dtype=int64
+
+Loading multihorizon_X_validation.npy
+  shape=(2703, 100, 68)  dtype=float32
+Loading multihorizon_y50_validation.npy
+  shape=(2703,)  dtype=int64
+Loading multihorizon_y100_validation.npy
+  shape=(2703,)  dtype=int64
+Loading multihorizon_y200_validation.npy
+  shape=(2703,)  dtype=int64
+Loading multihorizon_y500_validation.npy
+  shape=(2703,)  dtype=int64
+
+Loading multihorizon_X_test.npy
+  shape=(2703, 100, 68)  dtype=float32
+Loading multihorizon_y50_test.npy
+  shape=(2703,)  dtype=int64
+Loading multihorizon_y100_test.npy
+  shape=(2703,)  dtype=int64
+Loading multihorizon_y200_test.npy
+  shape=(2703,)  dtype=int64
+Loading multihorizon_y500_test.npy
+  shape=(2703,)  dtype=int64
+[OK] Required tensor files exist
+
+===========================================================================
+LOAD METADATA
+===========================================================================
+
+Metadata file: C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\processed\multihorizon_sequence_metadata.csv
+Rows    : 18,921
+Columns : 11
+Columns : window_id, episode_id, observation_start_position, observation_end_position, observation_length, forecast_start_position, dataset_split, y50, y100, y200, y500
+[OK] Metadata file exists
+[OK] Metadata columns
+
+===========================================================================
+X SHAPES
+===========================================================================
+
+TRAIN
+  Expected : (13515, 100, 68)
+  Actual   : (13515, 100, 68)
+[OK] X_train shape  (13515, 100, 68)
+
+VALIDATION
+  Expected : (2703, 100, 68)
+  Actual   : (2703, 100, 68)
+[OK] X_validation shape  (2703, 100, 68)
+
+TEST
+  Expected : (2703, 100, 68)
+  Actual   : (2703, 100, 68)
+[OK] X_test shape  (2703, 100, 68)
+
+===========================================================================
+TARGET LENGTHS AND VALUE CHECKS
+===========================================================================
+
+TRAIN  X rows=13,515
+  y50: shape=(13515,)  unique=[0, 1]
+[OK] y50_train length matches X  (13515,)
+[OK] y50_train is binary 0/1
+  y100: shape=(13515,)  unique=[0, 1]
+[OK] y100_train length matches X  (13515,)
+[OK] y100_train is binary 0/1
+  y200: shape=(13515,)  unique=[0, 1]
+[OK] y200_train length matches X  (13515,)
+[OK] y200_train is binary 0/1
+  y500: shape=(13515,)  unique=[0, 1]
+[OK] y500_train length matches X  (13515,)
+[OK] y500_train is binary 0/1
+
+VALIDATION  X rows=2,703
+  y50: shape=(2703,)  unique=[0, 1]
+[OK] y50_validation length matches X  (2703,)
+[OK] y50_validation is binary 0/1
+  y100: shape=(2703,)  unique=[0, 1]
+[OK] y100_validation length matches X  (2703,)
+[OK] y100_validation is binary 0/1
+  y200: shape=(2703,)  unique=[0, 1]
+[OK] y200_validation length matches X  (2703,)
+[OK] y200_validation is binary 0/1
+  y500: shape=(2703,)  unique=[0, 1]
+[OK] y500_validation length matches X  (2703,)
+[OK] y500_validation is binary 0/1
+
+TEST  X rows=2,703
+  y50: shape=(2703,)  unique=[0, 1]
+[OK] y50_test length matches X  (2703,)
+[OK] y50_test is binary 0/1
+  y100: shape=(2703,)  unique=[0, 1]
+[OK] y100_test length matches X  (2703,)
+[OK] y100_test is binary 0/1
+  y200: shape=(2703,)  unique=[0, 1]
+[OK] y200_test length matches X  (2703,)
+[OK] y200_test is binary 0/1
+  y500: shape=(2703,)  unique=[0, 1]
+[OK] y500_test length matches X  (2703,)
+[OK] y500_test is binary 0/1
+
+===========================================================================
+TARGET DISTRIBUTIONS
+===========================================================================
+
+--- 50-flow horizon ---
+  TRAIN       0=12,765  1=750  positive_rate=0.0555  expected_positives=750
+[OK] 50-flow train positives  750
+  VALIDATION  0=2,553  1=150  positive_rate=0.0555  expected_positives=150
+[OK] 50-flow validation positives  150
+  TEST        0=2,553  1=150  positive_rate=0.0555  expected_positives=150
+[OK] 50-flow test positives  150
+
+--- 100-flow horizon ---
+  TRAIN       0=12,015  1=1,500  positive_rate=0.1110  expected_positives=1,500
+[OK] 100-flow train positives  1,500
+  VALIDATION  0=2,403  1=300  positive_rate=0.1110  expected_positives=300
+[OK] 100-flow validation positives  300
+  TEST        0=2,403  1=300  positive_rate=0.1110  expected_positives=300
+[OK] 100-flow test positives  300
+
+--- 200-flow horizon ---
+  TRAIN       0=10,515  1=3,000  positive_rate=0.2220  expected_positives=3,000
+[OK] 200-flow train positives  3,000
+  VALIDATION  0=2,103  1=600  positive_rate=0.2220  expected_positives=600
+[OK] 200-flow validation positives  600
+  TEST        0=2,103  1=600  positive_rate=0.2220  expected_positives=600
+[OK] 200-flow test positives  600
+
+--- 500-flow horizon ---
+  TRAIN       0=6,015  1=7,500  positive_rate=0.5549  expected_positives=7,500
+[OK] 500-flow train positives  7,500
+  VALIDATION  0=1,203  1=1,500  positive_rate=0.5549  expected_positives=1,500
+[OK] 500-flow validation positives  1,500
+  TEST        0=1,203  1=1,500  positive_rate=0.5549  expected_positives=1,500
+[OK] 500-flow test positives  1,500
+
+===========================================================================
+NaN / INF / SEQUENCE STRUCTURE
+===========================================================================
+
+TRAIN
+  NaN count       : 0
+  Inf count       : 0
+  Sequence length : 100
+  Feature count   : 68
+[OK] X_train sequence length = 100
+[OK] X_train feature count = 68
+
+VALIDATION
+  NaN count       : 0
+  Inf count       : 0
+  Sequence length : 100
+  Feature count   : 68
+[OK] X_validation sequence length = 100
+[OK] X_validation feature count = 68
+
+TEST
+  NaN count       : 0
+  Inf count       : 0
+  Sequence length : 100
+  Feature count   : 68
+[OK] X_test sequence length = 100
+[OK] X_test feature count = 68
+
+Total NaN in all X tensors: 0
+Total Inf in all X tensors: 0
+[OK] NaN count = 0
+[OK] Inf count = 0
+
+===========================================================================
+METADATA VALIDATION
+===========================================================================
+
+Total metadata rows: 18,921
+Expected           : 18,921
+[OK] Metadata total rows = 18,921
+
+dataset_split counts:
+dataset_split
+TRAIN         13515
+VALIDATION     2703
+TEST           2703
+Name: count, dtype: int64
+[OK] Metadata TRAIN count  13,515
+[OK] Metadata VALIDATION count  2,703
+[OK] Metadata TEST count  2,703
+
+TRAIN episodes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+Expected        : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+[OK] TRAIN episodes  1-15
+
+VALIDATION episodes: [16, 17, 18]
+Expected        : [16, 17, 18]
+[OK] VALIDATION episodes  16-18
+
+TEST episodes: [19, 20, 21]
+Expected        : [19, 20, 21]
+[OK] TEST episodes  19-21
+[OK] No episode overlap
+
+===========================================================================
+METADATA / TENSOR ALIGNMENT
+===========================================================================
+
+Tensors were built in metadata row order, then split by episode_id. Each split tensor must match the corresponding metadata subset in that same order.
+
+TRAIN:
+  metadata rows : 13,515
+  X rows        : 13,515
+  y50 matches metadata in order
+  y100 matches metadata in order
+  y200 matches metadata in order
+  y500 matches metadata in order
+
+VALIDATION:
+  metadata rows : 2,703
+  X rows        : 2,703
+  y50 matches metadata in order
+  y100 matches metadata in order
+  y200 matches metadata in order
+  y500 matches metadata in order
+
+TEST:
+  metadata rows : 2,703
+  X rows        : 2,703
+  y50 matches metadata in order
+  y100 matches metadata in order
+  y200 matches metadata in order
+  y500 matches metadata in order
+[OK] Metadata ordering matches tensors  All split targets match metadata row order
+
+===========================================================================
+FINAL VALIDATION
+===========================================================================
+
+[OK] Required tensor files exist
+[OK] Metadata file exists
+[OK] Metadata columns
+[OK] X_train shape  (13515, 100, 68)
+[OK] X_validation shape  (2703, 100, 68)
+[OK] X_test shape  (2703, 100, 68)
+[OK] y50_train length matches X  (13515,)
+[OK] y50_train is binary 0/1
+[OK] y100_train length matches X  (13515,)
+[OK] y100_train is binary 0/1
+[OK] y200_train length matches X  (13515,)
+[OK] y200_train is binary 0/1
+[OK] y500_train length matches X  (13515,)
+[OK] y500_train is binary 0/1
+[OK] y50_validation length matches X  (2703,)
+[OK] y50_validation is binary 0/1
+[OK] y100_validation length matches X  (2703,)
+[OK] y100_validation is binary 0/1
+[OK] y200_validation length matches X  (2703,)
+[OK] y200_validation is binary 0/1
+[OK] y500_validation length matches X  (2703,)
+[OK] y500_validation is binary 0/1
+[OK] y50_test length matches X  (2703,)
+[OK] y50_test is binary 0/1
+[OK] y100_test length matches X  (2703,)
+[OK] y100_test is binary 0/1
+[OK] y200_test length matches X  (2703,)
+[OK] y200_test is binary 0/1
+[OK] y500_test length matches X  (2703,)
+[OK] y500_test is binary 0/1
+[OK] 50-flow train positives  750
+[OK] 50-flow validation positives  150
+[OK] 50-flow test positives  150
+[OK] 100-flow train positives  1,500
+[OK] 100-flow validation positives  300
+[OK] 100-flow test positives  300
+[OK] 200-flow train positives  3,000
+[OK] 200-flow validation positives  600
+[OK] 200-flow test positives  600
+[OK] 500-flow train positives  7,500
+[OK] 500-flow validation positives  1,500
+[OK] 500-flow test positives  1,500
+[OK] X_train sequence length = 100
+[OK] X_train feature count = 68
+[OK] X_validation sequence length = 100
+[OK] X_validation feature count = 68
+[OK] X_test sequence length = 100
+[OK] X_test feature count = 68
+[OK] NaN count = 0
+[OK] Inf count = 0
+[OK] Metadata total rows = 18,921
+[OK] Metadata TRAIN count  13,515
+[OK] Metadata VALIDATION count  2,703
+[OK] Metadata TEST count  2,703
+[OK] TRAIN episodes  1-15
+[OK] VALIDATION episodes  16-18
+[OK] TEST episodes  19-21
+[OK] No episode overlap
+[OK] Metadata ordering matches tensors  All split targets match metadata row order
+
+---------------------------------------------------------------------------
+Summary: 59 OK, 0 WARNING, 0 FAIL
+
+OVERALL: [OK]
+
+===========================================================================
+VALIDATION COMPLETE
+===========================================================================
