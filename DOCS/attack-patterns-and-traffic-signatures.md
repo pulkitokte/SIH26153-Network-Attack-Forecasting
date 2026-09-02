@@ -1,8 +1,8 @@
-\# SIH26153 — Attack Patterns and Network Traffic Signatures
+# SIH26153 — Attack Patterns and Network Traffic Signatures
 
 
 
-\## 1. Purpose
+## 1. Purpose
 
 
 
@@ -14,15 +14,15 @@ The objective is to document:
 
 
 
-\- DDoS-related traffic behavior observed in CICIDS2017.
+- DDoS-related traffic behavior observed in CICIDS2017.
 
-\- Measurable changes in network-flow features around DDoS attack periods.
+- Measurable changes in network-flow features around DDoS attack periods.
 
-\- Relevant traffic indicators that can support temporal attack forecasting.
+- Relevant traffic indicators that can support temporal attack forecasting.
 
-\- The distinction between detecting an ongoing attack and forecasting an upcoming attack.
+- The distinction between detecting an ongoing attack and forecasting an upcoming attack.
 
-\- How the observed behavior can be connected to the project's predictive cybersecurity narrative.
+- How the observed behavior can be connected to the project's predictive cybersecurity narrative.
 
 
 
@@ -30,11 +30,11 @@ This document is based on the existing CICIDS2017 analysis and forecasting repor
 
 
 
-\---
+---
 
 
 
-\## 2. Dataset Context
+## 2. Dataset Context
 
 
 
@@ -46,13 +46,13 @@ The repository's feature documentation reports:
 
 
 
-\- Total rows: 2,830,743
+- Total rows: 2,830,743
 
-\- Total columns: 80
+- Total columns: 80
 
-\- Label column: `Label`
+- Label column: `Label`
 
-\- Unique attack/traffic labels: 15
+- Unique attack/traffic labels: 15
 
 
 
@@ -60,31 +60,31 @@ The major classes include:
 
 
 
-\- BENIGN
+- BENIGN
 
-\- DDoS
+- DDoS
 
-\- DoS Hulk
+- DoS Hulk
 
-\- DoS GoldenEye
+- DoS GoldenEye
 
-\- DoS slowloris
+- DoS slowloris
 
-\- DoS Slowhttptest
+- DoS Slowhttptest
 
-\- PortScan
+- PortScan
 
-\- Bot
+- Bot
 
-\- FTP-Patator
+- FTP-Patator
 
-\- SSH-Patator
+- SSH-Patator
 
-\- Infiltration
+- Infiltration
 
-\- Web attacks
+- Web attacks
 
-\- Heartbleed
+- Heartbleed
 
 
 
@@ -96,39 +96,39 @@ The feature documentation identifies flow-level network measurements such as:
 
 
 
-\- Flow Duration
+- Flow Duration
 
-\- Total Fwd Packets
+- Total Fwd Packets
 
-\- Total Backward Packets
+- Total Backward Packets
 
-\- Total Length of Fwd Packets
+- Total Length of Fwd Packets
 
-\- Total Length of Bwd Packets
+- Total Length of Bwd Packets
 
-\- Flow Bytes/s
+- Flow Bytes/s
 
-\- Flow Packets/s
+- Flow Packets/s
 
-\- Fwd Packets/s
+- Fwd Packets/s
 
-\- Bwd Packets/s
+- Bwd Packets/s
 
-\- Packet Length Mean
+- Packet Length Mean
 
-\- Packet Length Std
+- Packet Length Std
 
-\- SYN Flag Count
+- SYN Flag Count
 
-\- RST Flag Count
+- RST Flag Count
 
-\- ACK Flag Count
+- ACK Flag Count
 
-\- Average Packet Size
+- Average Packet Size
 
-\- Flow IAT statistics
+- Flow IAT statistics
 
-\- Active/Idle statistics
+- Active/Idle statistics
 
 
 
@@ -136,11 +136,11 @@ The final forecasting feature preparation reduced the working representation to 
 
 
 
-\---
+---
 
 
 
-\## 3. Observed DDoS Traffic Behavior
+## 3. Observed DDoS Traffic Behavior
 
 
 
@@ -152,7 +152,7 @@ The analysis was specifically performed to determine whether network-flow featur
 
 
 
-\### 3.1 Combined Test-Episode Changes
+### 3.1 Combined Test-Episode Changes
 
 
 
@@ -192,7 +192,7 @@ These values show that the network-flow representation changes substantially bet
 
 
 
-\### 3.2 Important Interpretation
+### 3.2 Important Interpretation
 
 
 
@@ -200,23 +200,23 @@ The strongest observed changes include:
 
 
 
-\- Very large decreases in `Flow Packets/s`.
+- Very large decreases in `Flow Packets/s`.
 
-\- Very large decreases in `Fwd Packets/s`.
+- Very large decreases in `Fwd Packets/s`.
 
-\- Very large decreases in `Bwd Packets/s`.
+- Very large decreases in `Bwd Packets/s`.
 
-\- A large decrease in `Flow Bytes/s`.
+- A large decrease in `Flow Bytes/s`.
 
-\- A large decrease in total forward-packet length.
+- A large decrease in total forward-packet length.
 
-\- A large increase in total backward-packet length.
+- A large increase in total backward-packet length.
 
-\- Changes in packet-size statistics.
+- Changes in packet-size statistics.
 
-\- Changes in flow duration.
+- Changes in flow duration.
 
-\- A measurable change in SYN flag behavior.
+- A measurable change in SYN flag behavior.
 
 
 
@@ -228,11 +228,11 @@ However, these are \*\*aggregate pre-attack vs attack comparisons\*\*. They shou
 
 
 
-\---
+---
 
 
 
-\## 4. Relevant Traffic Indicators for Forecasting
+## 4. Relevant Traffic Indicators for Forecasting
 
 
 
@@ -240,7 +240,7 @@ The current analysis suggests several categories of network behavior that are us
 
 
 
-\### 4.1 Traffic Volume and Rate
+### 4.1 Traffic Volume and Rate
 
 
 
@@ -248,17 +248,17 @@ Relevant measurements include:
 
 
 
-\- Flow Packets/s
+- Flow Packets/s
 
-\- Flow Bytes/s
+- Flow Bytes/s
 
-\- Fwd Packets/s
+- Fwd Packets/s
 
-\- Bwd Packets/s
+- Bwd Packets/s
 
-\- Total Fwd Packets
+- Total Fwd Packets
 
-\- Total Backward Packets
+- Total Backward Packets
 
 
 
@@ -270,7 +270,7 @@ The temporal analysis shows substantial changes in several of these values aroun
 
 
 
-\### 4.2 Packet Size Characteristics
+### 4.2 Packet Size Characteristics
 
 
 
@@ -278,15 +278,15 @@ Relevant measurements include:
 
 
 
-\- Packet Length Mean
+- Packet Length Mean
 
-\- Packet Length Std
+- Packet Length Std
 
-\- Average Packet Size
+- Average Packet Size
 
-\- Fwd Packet Length statistics
+- Fwd Packet Length statistics
 
-\- Bwd Packet Length statistics
+- Bwd Packet Length statistics
 
 
 
@@ -294,7 +294,7 @@ The test-episode analysis shows measurable changes in packet-size characteristic
 
 
 
-\### 4.3 Flow Timing Characteristics
+### 4.3 Flow Timing Characteristics
 
 
 
@@ -302,19 +302,19 @@ Relevant measurements include:
 
 
 
-\- Flow Duration
+- Flow Duration
 
-\- Flow IAT Mean
+- Flow IAT Mean
 
-\- Flow IAT Std
+- Flow IAT Std
 
-\- Flow IAT Max
+- Flow IAT Max
 
-\- Flow IAT Min
+- Flow IAT Min
 
-\- Forward IAT statistics
+- Forward IAT statistics
 
-\- Backward IAT statistics
+- Backward IAT statistics
 
 
 
@@ -322,7 +322,7 @@ These features provide information about the temporal structure of network flows
 
 
 
-\### 4.4 TCP Flag Indicators
+### 4.4 TCP Flag Indicators
 
 
 
@@ -330,19 +330,19 @@ Relevant measurements include:
 
 
 
-\- SYN Flag Count
+- SYN Flag Count
 
-\- RST Flag Count
+- RST Flag Count
 
-\- PSH Flag Count
+- PSH Flag Count
 
-\- ACK Flag Count
+- ACK Flag Count
 
-\- FIN Flag Count
+- FIN Flag Count
 
-\- URG Flag Count
+- URG Flag Count
 
-\- ECE Flag Count
+- ECE Flag Count
 
 
 
@@ -350,15 +350,15 @@ The current temporal analysis specifically reports a change in SYN Flag Count ac
 
 
 
-\---
+---
 
 
 
-\## 5. Attack Pattern: DDoS
+## 5. Attack Pattern: DDoS
 
 
 
-\### Pattern
+### Pattern
 
 
 
@@ -374,17 +374,17 @@ The sequence analysis reports:
 
 
 
-\- 225,745 total rows.
+- 225,745 total rows.
 
-\- 45 contiguous label regions.
+- 45 contiguous label regions.
 
-\- 22 DDoS regions.
+- 22 DDoS regions.
 
-\- The first major DDoS region begins at sequence position 18,883.
+- The first major DDoS region begins at sequence position 18,883.
 
-\- The final listed DDoS region ends at sequence position 197,542.
+- The final listed DDoS region ends at sequence position 197,542.
 
-\- One anomalous DDoS region contains only 3 flows.
+- One anomalous DDoS region contains only 3 flows.
 
 
 
@@ -392,7 +392,7 @@ This demonstrates that the dataset contains temporally contiguous attack episode
 
 
 
-\### Cybersecurity Relevance
+### Cybersecurity Relevance
 
 
 
@@ -404,15 +404,15 @@ The project therefore treats network traffic as a sequence of observations.
 
 
 
-\---
+---
 
 
 
-\## 6. Detection vs Forecasting
+## 6. Detection vs Forecasting
 
 
 
-\### Traditional Detection
+### Traditional Detection
 
 
 
@@ -428,7 +428,7 @@ The classifier receives the current or recent traffic representation and produce
 
 
 
-\### Forecasting
+### Forecasting
 
 
 
@@ -456,23 +456,23 @@ Therefore, the project evaluates:
 
 
 
-\- Classification performance.
+- Classification performance.
 
-\- Temporal warning behavior.
+- Temporal warning behavior.
 
-\- Lead time before attack onset.
+- Lead time before attack onset.
 
-\- False alarm behavior.
+- False alarm behavior.
 
-\- Performance across different forecast horizons.
-
-
-
-\---
+- Performance across different forecast horizons.
 
 
 
-\## 7. Current Forecasting Baseline
+---
+
+
+
+## 7. Current Forecasting Baseline
 
 
 
@@ -484,9 +484,9 @@ Configuration:
 
 
 
-\- Representation: mean + standard deviation over a 100-flow observation window.
+- Representation: mean + standard deviation over a 100-flow observation window.
 
-\- Selected threshold: 0.90.
+- Selected threshold: 0.90.
 
 
 
@@ -516,11 +516,11 @@ This provides the baseline against which the neural forecasting model can be com
 
 
 
-\---
+---
 
 
 
-\## 8. GRU V2 Forecasting Result
+## 8. GRU V2 Forecasting Result
 
 
 
@@ -532,23 +532,23 @@ Configuration:
 
 
 
-\- Input shape: `(1365, 100, 68)`
+- Input shape: `(1365, 100, 68)`
 
-\- Observation window: 100 flows
+- Observation window: 100 flows
 
-\- Features: 68
+- Features: 68
 
-\- Hidden size: 96
+- Hidden size: 96
 
-\- GRU layers: 2
+- GRU layers: 2
 
-\- Dropout: 0.3
+- Dropout: 0.3
 
-\- Learning rate: 0.0005
+- Learning rate: 0.0005
 
-\- Weight decay: 0.0001
+- Weight decay: 0.0001
 
-\- Selected threshold: 0.4000
+- Selected threshold: 0.4000
 
 
 
@@ -578,13 +578,13 @@ Compared with the Logistic Regression baseline, GRU V2 shows:
 
 
 
-\- Higher F1: 0.6818 vs 0.4091.
+- Higher F1: 0.6818 vs 0.4091.
 
-\- Higher ROC-AUC: 0.9329 vs 0.8514.
+- Higher ROC-AUC: 0.9329 vs 0.8514.
 
-\- Lower False Alarm Rate: 0.1152 vs 0.1646.
+- Lower False Alarm Rate: 0.1152 vs 0.1646.
 
-\- Higher recall: 1.0000 vs 0.6000.
+- Higher recall: 1.0000 vs 0.6000.
 
 
 
@@ -596,11 +596,11 @@ It does not, by itself, prove that the model will generalize to every network en
 
 
 
-\---
+---
 
 
 
-\## 9. Why Temporal Context Matters
+## 9. Why Temporal Context Matters
 
 
 
@@ -624,11 +624,11 @@ The GRU architecture is therefore used to model sequential information that a si
 
 
 
-\---
+---
 
 
 
-\## 10. Early-Warning Evidence
+## 10. Early-Warning Evidence
 
 
 
@@ -668,11 +668,11 @@ The episode-level lead-time distribution must be reported alongside the warning 
 
 
 
-\---
+---
 
 
 
-\## 11. Multi-Horizon Forecasting
+## 11. Multi-Horizon Forecasting
 
 
 
@@ -702,17 +702,17 @@ The 200-flow horizon had:
 
 
 
-\- F1: 0.7927
+- F1: 0.7927
 
-\- Precision: 0.7572
+- Precision: 0.7572
 
-\- Recall: 0.8317
+- Recall: 0.8317
 
-\- ROC-AUC: 0.9225
+- ROC-AUC: 0.9225
 
-\- PR-AUC: 0.7726
+- PR-AUC: 0.7726
 
-\- False Alarm Rate: 0.0761
+- False Alarm Rate: 0.0761
 
 
 
@@ -720,11 +720,11 @@ The 500-flow horizon requires particular caution:
 
 
 
-\- Its reported mean lead was 901 flows.
+- Its reported mean lead was 901 flows.
 
-\- Its False Alarm Rate was 0.9933.
+- Its False Alarm Rate was 0.9933.
 
-\- Warnings fired at the first pre-attack window in the analyzed episodes.
+- Warnings fired at the first pre-attack window in the analyzed episodes.
 
 
 
@@ -736,11 +736,11 @@ Also, this operational multi-horizon analysis should not be confused with a full
 
 
 
-\---
+---
 
 
 
-\## 12. MITRE ATT\&CK Mapping Status
+## 12. MITRE ATT\&CK Mapping Status
 
 
 
@@ -764,11 +764,11 @@ A formal MITRE ATT\&CK mapping should be added only after the relevant technique
 
 
 
-\---
+---
 
 
 
-\## 13. Detection-to-Forecasting Narrative
+## 13. Detection-to-Forecasting Narrative
 
 
 
@@ -776,7 +776,7 @@ The system can be presented as a progression:
 
 
 
-\### Step 1 — Observe
+### Step 1 — Observe
 
 
 
@@ -784,7 +784,7 @@ Collect recent network-flow observations.
 
 
 
-\### Step 2 — Represent
+### Step 2 — Represent
 
 
 
@@ -792,7 +792,7 @@ Convert the recent traffic into the model's 68-feature representation.
 
 
 
-\### Step 3 — Model Temporal State
+### Step 3 — Model Temporal State
 
 
 
@@ -800,7 +800,7 @@ Use sequential observations to represent the recent network state.
 
 
 
-\### Step 4 — Forecast
+### Step 4 — Forecast
 
 
 
@@ -808,7 +808,7 @@ Estimate the probability of a future DDoS-related state.
 
 
 
-\### Step 5 — Evaluate Warning Quality
+### Step 5 — Evaluate Warning Quality
 
 
 
@@ -816,21 +816,21 @@ Measure:
 
 
 
-\- Whether an attack was warned about.
+- Whether an attack was warned about.
 
-\- How many flows before attack onset the warning occurred.
+- How many flows before attack onset the warning occurred.
 
-\- False alarms.
+- False alarms.
 
-\- Precision/recall/F1.
+- Precision/recall/F1.
 
-\- ROC-AUC and PR-AUC.
+- ROC-AUC and PR-AUC.
 
-\- Performance across forecast horizons.
+- Performance across forecast horizons.
 
 
 
-\### Step 6 — Explain
+### Step 6 — Explain
 
 
 
@@ -842,11 +842,11 @@ This is the core distinction between a static IDS-style classifier and the inten
 
 
 
-\---
+---
 
 
 
-\## 14. Cybersecurity Interpretation for the Dashboard
+## 14. Cybersecurity Interpretation for the Dashboard
 
 
 
@@ -854,7 +854,7 @@ The dashboard should distinguish between:
 
 
 
-\### Current Attack Status
+### Current Attack Status
 
 
 
@@ -866,7 +866,7 @@ and
 
 
 
-\### Forecasted Attack Risk
+### Forecasted Attack Risk
 
 
 
@@ -882,21 +882,21 @@ Recommended terminology:
 
 
 
-\- `Current State`
+- `Current State`
 
-\- `Forecast Probability`
+- `Forecast Probability`
 
-\- `Forecast Horizon`
+- `Forecast Horizon`
 
-\- `Warning Lead Time`
+- `Warning Lead Time`
 
-\- `Confidence / Threshold`
+- `Confidence / Threshold`
 
-\- `Top Contributing Features`
+- `Top Contributing Features`
 
-\- `Attack Scenario`
+- `Attack Scenario`
 
-\- `Alert Status`
+- `Alert Status`
 
 
 
@@ -904,11 +904,11 @@ Any mock dashboard values must remain clearly separated from real model outputs 
 
 
 
-\---
+---
 
 
 
-\## 15. Limitations
+## 15. Limitations
 
 
 
@@ -936,11 +936,11 @@ The current cybersecurity analysis has several important limitations:
 
 
 
-\---
+---
 
 
 
-\## 16. Current Cybersecurity Takeaway
+## 16. Current Cybersecurity Takeaway
 
 
 
