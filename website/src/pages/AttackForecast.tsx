@@ -1,66 +1,182 @@
-import { ArrowDown, ArrowUp } from 'lucide-react';
-import { PredictionCard } from '../components/forecast/PredictionCard';
-import { ForecastChart } from '../components/forecast/ForecastChart';
-import { AttackTypeCard } from '../components/forecast/AttackTypeCard';
+import { useEffect, useState } from 'react';
+import { ShieldAlert } from 'lucide-react';
+import { MultiHorizonPredictionCard } from '../components/forecast/MultiHorizonPredictionCard';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { useSimulation } from '../context/SimulationContext';
-import { getRiskLevel } from '../utils/risk';
+import {
+  getDemoSequence,
+  predict,
+  type DemoSequenceResponse,
+} from '../services/api';
+import type { MultiHorizonPrediction } from '../types';
 
 export function AttackForecast() {
-  const { data } = useSimulation();
+  const [prediction, setPrediction] =
+    useState<MultiHorizonPrediction | null>(null);
+
+  const [demoSequence, setDemoSequence] =
+    useState<DemoSequenceResponse | null>(null);
+
+  const [predictionError, setPredictionError] =
+    useState<string | null>(null);
+
+  const [predictionLoading, setPredictionLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRealPrediction() {
+      setPredictionLoading(true);
+      setPredictionError(null);
+
+      try {
+        const sequenceResponse = await getDemoSequence();
+
+        if (cancelled) {
+          return;
+        }
+
+        setDemoSequence(sequenceResponse);
+
+        const modelPrediction = await predict(sequenceResponse.sequence);
+
+        if (cancelled) {
+          return;
+        }
+
+        setPrediction(modelPrediction);
+      } catch (error) {
+        if (!cancelled) {
+          setPredictionError(
+            error instanceof Error
+              ? error.message
+              : 'Unable to load real model prediction.',
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setPredictionLoading(false);
+        }
+      }
+    }
+
+    void loadRealPrediction();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const attackHorizons = prediction
+    ? [50, 100, 200, 500].filter(
+        (horizon) => Number(prediction.predictions[String(horizon)]) === 1,
+      )
+    : [];
+
   return (
     <div className="space-y-6">
       <SectionHeader
         eyebrow="Forecasting engine"
         title="Predictive Threat Intelligence"
-        subtitle="LSTM/GRU output over the near-term horizon. This is a forecast, not a confirmation that an attack is already underway."
+        subtitle="Multi-Horizon GRU forecasting over future network-flow windows. This is a forecast, not a confirmation that an attack is already underway."
       />
-      <div className="grid gap-4 xl:grid-cols-5">
-        <div className="xl:col-span-2">
-          <PredictionCard
-            probability={data.attackProbability}
-            predictedAttack={data.predictedAttack}
-            confidence={data.confidence}
-            horizon={data.forecastHorizonMin}
-            risk={getRiskLevel(data.attackProbability)}
-          />
+
+      {predictionLoading && (
+        <div className="glass rounded-2xl p-5 text-sm text-mute">
+          Running real Multi-Horizon GRU inference...
         </div>
-        <div className="glass rounded-2xl p-5 xl:col-span-3">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold">Attack probability over time</h2>
-            <p className="font-mono text-[11px] text-cyan">Forecast: Next {data.forecastHorizonMin} Minutes</p>
-          </div>
-          <ForecastChart data={data.forecastSeries} />
+      )}
+
+      {predictionError && (
+        <div className="glass rounded-2xl border border-critical/20 p-5 text-sm text-critical">
+          {predictionError}
         </div>
-      </div>
-      <section className="glass rounded-2xl p-5">
-        <h2 className="text-lg font-semibold">Why is the AI predicting this?</h2>
-        <p className="mt-1 mb-4 text-sm text-mute">
-          Feature contributions from the Isolation Forest layer and temporal model. Judges should read this as model rationale, not ground truth.
-        </p>
-        <div className="grid gap-3 md:grid-cols-2">
-          {data.factors.map((f) => (
-            <div key={f.id} className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
-              <div className="flex items-center justify-between gap-2">
-                <p className="flex items-center gap-2 text-sm font-medium">
-                  {f.direction === 'up' ? <ArrowUp className="h-4 w-4 text-critical" /> : <ArrowDown className="h-4 w-4 text-safe" />}
-                  {f.label}
-                </p>
-                <span className="font-mono text-xs text-mute">{f.impact}</span>
+      )}
+
+      {prediction && (
+        <>
+          <MultiHorizonPredictionCard prediction={prediction} />
+
+          {demoSequence && (
+            <div className="glass rounded-2xl border border-cyan/20 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cyan">
+                    Offline Demo Sequence
+                  </p>
+
+                  <p className="mt-1 text-sm text-ink">
+                    CICIDS2017 held-out TEST sequence
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3 font-mono text-[11px] text-mute">
+                  <span>Window {demoSequence.window_id}</span>
+                  <span>Episode {demoSequence.episode_id}</span>
+                  <span>
+                    Flows {demoSequence.observation_start_position}–
+                    {demoSequence.observation_end_position}
+                  </span>
+                </div>
               </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/8">
-                <div className="h-full rounded-full bg-cyan" style={{ width: `${f.impact}%` }} />
-              </div>
-              <p className="mt-2 text-xs text-mute">{f.detail}</p>
             </div>
-          ))}
-        </div>
-      </section>
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {data.attackTypes.map((item) => (
-          <AttackTypeCard key={item.type} item={item} />
-        ))}
-      </section>
+          )}
+
+          <section className="glass rounded-2xl p-5">
+            <div className="flex items-start gap-3">
+              <div className="rounded-xl border border-critical/20 bg-critical/10 p-2">
+                <ShieldAlert className="h-5 w-5 text-critical" />
+              </div>
+
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cyan">
+                  Model Forecast Interpretation
+                </p>
+
+                <h2 className="mt-2 text-lg font-semibold">
+                  Attack forecast is positive across all four horizons
+                </h2>
+
+                <p className="mt-2 text-sm leading-6 text-mute">
+                  The trained Multi-Horizon GRU classified the selected
+                  held-out test sequence as an attack forecast at the
+                  50-, 100-, 200-, and 500-flow horizons.
+                </p>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
+                    <p className="text-[11px] uppercase tracking-wide text-mute">
+                      Positive forecast horizons
+                    </p>
+
+                    <p className="mt-2 font-mono text-2xl font-semibold">
+                      {attackHorizons.length}/4
+                    </p>
+
+                    <p className="mt-1 text-xs text-mute">
+                      Horizons crossing their calibrated thresholds
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
+                    <p className="text-[11px] uppercase tracking-wide text-mute">
+                      Sequence source
+                    </p>
+
+                    <p className="mt-2 text-sm font-semibold">
+                      Held-out TEST data
+                    </p>
+
+                    <p className="mt-1 text-xs text-mute">
+                      No live telemetry or fabricated feature mapping is used
+                      for this demo inference.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }

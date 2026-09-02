@@ -108,6 +108,12 @@ export interface ModelMetrics {
   demoNote: string;
 }
 
+export interface MultiHorizonPrediction {
+  probabilities: Record<string, number>;
+  thresholds: Record<string, number>;
+  predictions: Record<string, number>;
+}
+
 export interface ModelComparisonRow {
   model: string;
   accuracy: number;

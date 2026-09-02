@@ -1,4 +1,15 @@
-import type { AlertItem, AnalyticsBundle, DashboardData, ModelMetrics, TimeRange, TrafficFlow, TrafficPoint, TrafficSnapshot } from '../types';
+import type {
+  AlertItem,
+  AnalyticsBundle,
+  DashboardData,
+  ModelMetrics,
+  MultiHorizonPrediction,
+  TimeRange,
+  TrafficFlow,
+  TrafficPoint,
+  TrafficSnapshot,
+} from '../types';
+
 import {
   buildAnalytics,
   buildTrafficFlows,
@@ -17,6 +28,8 @@ import {
 
 const MOCK_LATENCY_MS = 40;
 
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 function wait(ms = MOCK_LATENCY_MS): Promise<void> {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
@@ -25,9 +38,11 @@ function wait(ms = MOCK_LATENCY_MS): Promise<void> {
 
 /**
  * Mock API layer for the SIH dashboard.
- * Swap these implementations with FastAPI fetches:
- *   GET /dashboard  GET /traffic  GET /forecast  GET /alerts  GET /metrics  POST /predict
+ *
+ * Existing dashboard endpoints remain mock-backed for now.
+ * Real trained-model inference is available through FastAPI.
  */
+
 export async function getDashboardData(): Promise<DashboardData> {
   await wait();
   return defaultDashboard;
@@ -46,9 +61,22 @@ export async function getTrafficData(): Promise<{
   };
 }
 
-export async function getForecast(): Promise<Pick<DashboardData, 'forecastSeries' | 'attackTypes' | 'factors' | 'attackProbability' | 'confidence' | 'predictedAttack' | 'forecastMessage' | 'forecastHorizonMin'>> {
+export async function getForecast(): Promise<
+  Pick<
+    DashboardData,
+    | 'forecastSeries'
+    | 'attackTypes'
+    | 'factors'
+    | 'attackProbability'
+    | 'confidence'
+    | 'predictedAttack'
+    | 'forecastMessage'
+    | 'forecastHorizonMin'
+  >
+> {
   await wait();
   const d = defaultDashboard;
+
   return {
     forecastSeries: d.forecastSeries,
     attackTypes: d.attackTypes,
@@ -59,6 +87,54 @@ export async function getForecast(): Promise<Pick<DashboardData, 'forecastSeries
     forecastMessage: d.forecastMessage,
     forecastHorizonMin: d.forecastHorizonMin,
   };
+}
+
+export interface DemoSequenceResponse {
+  source: string;
+  mode: string;
+  window_id: number;
+  episode_id: number;
+  test_index: number;
+  observation_start_position: number;
+  observation_end_position: number;
+  observation_length: number;
+  sequence: number[][];
+}
+
+export async function getDemoSequence(): Promise<DemoSequenceResponse> {
+  const response = await fetch(`${API_BASE_URL}/demo-sequence`);
+
+  if (!response.ok) {
+    const detail = await response.text();
+
+    throw new Error(
+      `Demo sequence request failed (${response.status}): ${detail}`,
+    );
+  }
+
+  return response.json() as Promise<DemoSequenceResponse>;
+}
+
+export async function predict(
+  sequence: number[][],
+): Promise<MultiHorizonPrediction> {
+  const response = await fetch(`${API_BASE_URL}/predict`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ sequence }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+
+    throw new Error(
+      `Prediction request failed (${response.status}): ${detail}`,
+    );
+  }
+
+  return response.json() as Promise<MultiHorizonPrediction>;
 }
 
 export async function getAlerts(): Promise<AlertItem[]> {
@@ -74,6 +150,7 @@ export async function getModelMetrics(): Promise<{
   pr: typeof prCurve;
 }> {
   await wait();
+
   return {
     metrics: defaultModelMetrics,
     comparison: modelComparison,
@@ -83,7 +160,9 @@ export async function getModelMetrics(): Promise<{
   };
 }
 
-export async function getAnalytics(range: TimeRange = '1h'): Promise<AnalyticsBundle> {
+export async function getAnalytics(
+  range: TimeRange = '1h',
+): Promise<AnalyticsBundle> {
   await wait();
   return buildAnalytics(range);
 }
