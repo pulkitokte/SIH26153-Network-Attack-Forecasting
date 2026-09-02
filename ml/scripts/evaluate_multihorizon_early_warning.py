@@ -2,6 +2,16 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+
 
 # ============================================================
 # CICIDS2017 - MULTI-HORIZON EARLY-WARNING EVALUATION
@@ -17,9 +27,12 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "processed"
 REPORT_DIR = BASE_DIR / "reports"
+METADATA_DIR = BASE_DIR / "metadata"
 
 PREDICTION_FILE = DATA_DIR / "multihorizon_gru_test_predictions.csv"
-FEATURE_FILE = DATA_DIR / "ddos_features_v1.csv"
+TEMPORAL_METADATA_FILE = (
+    METADATA_DIR / "test_episode_temporal_metadata.csv"
+)
 RESULTS_FILE = DATA_DIR / "multihorizon_early_warning_results.csv"
 REPORT_FILE = REPORT_DIR / "multihorizon_early_warning_report.txt"
 
@@ -35,43 +48,6 @@ THRESHOLDS = {
 }
 
 LEAD_SUCCESS_LEVELS = [10, 50, 100, 200, 500]
-
-# TEST classification metrics from the already-trained model.
-# These are forecasting metrics, not temporal lead-time metrics.
-CLASSIFICATION_METRICS = {
-    50: {
-        "f1": 0.4093,
-        "recall": 1.0000,
-        "precision": 0.2573,
-        "roc_auc": 0.9455,
-        "pr_auc": 0.3681,
-        "far": 0.1696,
-    },
-    100: {
-        "f1": 0.6577,
-        "recall": 0.9833,
-        "precision": 0.4941,
-        "roc_auc": 0.9492,
-        "pr_auc": 0.7019,
-        "far": 0.1257,
-    },
-    200: {
-        "f1": 0.7927,
-        "recall": 0.8317,
-        "precision": 0.7572,
-        "roc_auc": 0.9225,
-        "pr_auc": 0.7726,
-        "far": 0.0761,
-    },
-    500: {
-        "f1": 0.7151,
-        "recall": 1.0000,
-        "precision": 0.5566,
-        "roc_auc": 0.7644,
-        "pr_auc": 0.8423,
-        "far": 0.9933,
-    },
-}
 
 
 # ============================================================
@@ -102,6 +78,129 @@ def fmt_optional(value, digits=0):
     if digits == 0:
         return f"{int(value)}"
     return f"{value:.{digits}f}"
+
+
+def compute_horizon_classification(y_true, y_score, y_pred):
+    y_true = np.asarray(y_true).astype(int)
+    y_score = np.asarray(y_score).astype(float)
+    y_pred = np.asarray(y_pred).astype(int)
+
+    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    tn, fp, fn, tp = cm.ravel()
+    far_den = fp + tn
+    far = float(fp / far_den) if far_den > 0 else 0.0
+
+    return {
+        "precision": float(
+            precision_score(y_true, y_pred, zero_division=0)
+        ),
+        "recall": float(
+            recall_score(y_true, y_pred, zero_division=0)
+        ),
+        "f1": float(
+            f1_score(y_true, y_pred, zero_division=0)
+        ),
+        "accuracy": float(accuracy_score(y_true, y_pred)),
+        "roc_auc": float(roc_auc_score(y_true, y_score)),
+        "pr_auc": float(average_precision_score(y_true, y_score)),
+        "far": far,
+    }
+
+
+EXPECTED_TEMPORAL_COLUMNS = [
+    "episode_id",
+    "flow_start",
+    "flow_end",
+    "ddos_flows",
+    "attack_start",
+]
+
+EXPECTED_ATTACK_START = {
+    19: 37000,
+    20: 39000,
+    21: 41000,
+}
+
+
+def load_test_temporal_metadata(path):
+    if not path.exists():
+        raise ValueError(
+            f"TEST temporal metadata file not found: {path}"
+        )
+
+    metadata = pd.read_csv(path)
+    metadata.columns = metadata.columns.str.strip()
+
+    actual_columns = list(metadata.columns)
+    if actual_columns != EXPECTED_TEMPORAL_COLUMNS:
+        raise ValueError(
+            "TEST temporal metadata columns must be exactly "
+            f"{EXPECTED_TEMPORAL_COLUMNS}, got {actual_columns}"
+        )
+
+    for column in EXPECTED_TEMPORAL_COLUMNS:
+        if not pd.api.types.is_numeric_dtype(metadata[column]):
+            raise ValueError(
+                f"TEST temporal metadata column {column} "
+                "must be numeric/integer."
+            )
+        if metadata[column].isnull().any():
+            raise ValueError(
+                f"TEST temporal metadata column {column} "
+                "contains missing values."
+            )
+        if not np.array_equal(
+            metadata[column].to_numpy(),
+            metadata[column].to_numpy(dtype=np.int64),
+        ):
+            raise ValueError(
+                f"TEST temporal metadata column {column} "
+                "must contain integer values."
+            )
+        metadata[column] = metadata[column].astype(int)
+
+    episode_ids = metadata["episode_id"].tolist()
+    if episode_ids != TEST_EPISODES:
+        raise ValueError(
+            "TEST temporal metadata episode IDs must be exactly "
+            f"{TEST_EPISODES}, got {episode_ids}"
+        )
+
+    if metadata["episode_id"].duplicated().any():
+        raise ValueError(
+            "TEST temporal metadata contains duplicate episode_id values."
+        )
+
+    for row in metadata.itertuples(index=False):
+        episode_id = int(row.episode_id)
+        flow_start = int(row.flow_start)
+        flow_end = int(row.flow_end)
+        ddos_flows = int(row.ddos_flows)
+        attack_start = int(row.attack_start)
+
+        if not (flow_start < attack_start <= flow_end):
+            raise ValueError(
+                f"Episode {episode_id}: expected "
+                "flow_start < attack_start <= flow_end, "
+                f"got flow_start={flow_start}, "
+                f"attack_start={attack_start}, "
+                f"flow_end={flow_end}"
+            )
+
+        if ddos_flows <= 0:
+            raise ValueError(
+                f"Episode {episode_id}: ddos_flows must be > 0, "
+                f"got {ddos_flows}"
+            )
+
+        expected_start = EXPECTED_ATTACK_START[episode_id]
+        if attack_start != expected_start:
+            raise ValueError(
+                f"Episode {episode_id}: attack_start must be "
+                f"{expected_start}, got {attack_start}"
+            )
+
+    return metadata
 
 
 # ============================================================
@@ -171,55 +270,66 @@ if set(predictions["episode_id"].astype(int)) & set(range(1, 19)):
         "TRAIN/VALIDATION episodes leaked into the prediction CSV."
     )
 
-features = pd.read_csv(
-    FEATURE_FILE,
-    usecols=["Label", "episode_id", "sequence_position"],
-    low_memory=False,
-)
-features.columns = features.columns.str.strip()
-features["Label"] = features["Label"].astype(str).str.strip()
-features["episode_id"] = features["episode_id"].astype(int)
-features["sequence_position"] = features["sequence_position"].astype(int)
+log("\nValidating saved predictions against fixed validation thresholds...")
+for horizon in HORIZONS:
+    prob_col = f"probability_{horizon}"
+    pred_col = f"prediction_{horizon}"
+    expected_pred = (
+        predictions[prob_col].to_numpy(dtype=float)
+        >= THRESHOLDS[horizon]
+    ).astype(int)
+    actual_pred = predictions[pred_col].to_numpy(dtype=int)
+    n_mismatch = int(np.sum(actual_pred != expected_pred))
+    if n_mismatch:
+        raise ValueError(
+            f"Horizon {horizon}: {n_mismatch} saved prediction(s) "
+            "do not match int(probability >= "
+            f"{THRESHOLDS[horizon]:.2f}). Thresholds must not be "
+            "recalculated on TEST data."
+        )
+    log(
+        f"  {horizon}-flow threshold {THRESHOLDS[horizon]:.2f}: "
+        "prediction column matches probability cutoff"
+    )
 
-log(f"\nFeatures    : {FEATURE_FILE.name}")
-log("  Using Label, episode_id, sequence_position only.")
+temporal_metadata = load_test_temporal_metadata(
+    TEMPORAL_METADATA_FILE
+)
+
+log(f"\nTemporal metadata : {TEMPORAL_METADATA_FILE.name}")
+log("  Loaded verified source-derived TEST episode metadata.")
+log("  ddos_features_v1.csv is not required.")
 
 
 # ============================================================
-# ATTACK START FROM SOURCE FEATURES
+# ATTACK START FROM TEST TEMPORAL METADATA
 # ============================================================
 
 log("\n" + "=" * 75)
-log("ATTACK START POSITIONS (SOURCE FEATURES)")
+log("ATTACK START POSITIONS (TEST TEMPORAL METADATA)")
 log("=" * 75)
-log("\nAttack start = first DDoS sequence_position in the episode.")
+log(
+    "\nAttack-start positions are loaded from the verified "
+    "source-derived TEST temporal metadata."
+)
 
 attack_start_by_episode = {}
 
 for episode_id in TEST_EPISODES:
-    episode_flows = features[features["episode_id"] == episode_id]
-    if episode_flows.empty:
-        raise ValueError(
-            f"No source flows found for TEST episode {episode_id}."
-        )
+    row = temporal_metadata.loc[
+        temporal_metadata["episode_id"] == episode_id
+    ].iloc[0]
 
-    ddos_flows = episode_flows[episode_flows["Label"] == "DDoS"]
-    if ddos_flows.empty:
-        raise ValueError(
-            f"TEST episode {episode_id} has no DDoS flows."
-        )
-
-    attack_start = int(ddos_flows["sequence_position"].min())
+    flow_start = int(row["flow_start"])
+    flow_end = int(row["flow_end"])
+    ddos_flows = int(row["ddos_flows"])
+    attack_start = int(row["attack_start"])
     attack_start_by_episode[episode_id] = attack_start
 
     log(f"\nEpisode {episode_id}:")
-    log(
-        f"  Flow range     : "
-        f"{int(episode_flows['sequence_position'].min())} "
-        f".. {int(episode_flows['sequence_position'].max())}"
-    )
+    log(f"  Flow range     : {flow_start} .. {flow_end}")
     log(f"  Attack starts  : {attack_start}")
-    log(f"  DDoS flows     : {len(ddos_flows):,}")
+    log(f"  DDoS flows     : {ddos_flows:,}")
 
 
 # ============================================================
@@ -387,18 +497,30 @@ log(
     "\nThese metrics describe window-level DDoS detection."
 )
 log("They are NOT lead-time / early-warning metrics.")
-log("Copied from the already-trained model evaluation.")
+log(
+    "Metrics are computed directly from the saved TEST "
+    "prediction CSV using the existing validation-selected "
+    "thresholds."
+)
+
+classification_metrics = {}
+for horizon in HORIZONS:
+    classification_metrics[horizon] = compute_horizon_classification(
+        y_true=predictions[f"target_{horizon}"],
+        y_score=predictions[f"probability_{horizon}"],
+        y_pred=predictions[f"prediction_{horizon}"],
+    )
 
 log(
     f"\n{'Horizon':<10}{'F1':>8}{'Recall':>10}{'Prec':>10}"
-    f"{'ROC-AUC':>10}{'PR-AUC':>10}{'FAR':>10}"
+    f"{'Acc':>10}{'ROC-AUC':>10}{'PR-AUC':>10}{'FAR':>10}"
 )
 for horizon in HORIZONS:
-    m = CLASSIFICATION_METRICS[horizon]
+    m = classification_metrics[horizon]
     log(
         f"{horizon:<10}{m['f1']:8.4f}{m['recall']:10.4f}"
-        f"{m['precision']:10.4f}{m['roc_auc']:10.4f}"
-        f"{m['pr_auc']:10.4f}{m['far']:10.4f}"
+        f"{m['precision']:10.4f}{m['accuracy']:10.4f}"
+        f"{m['roc_auc']:10.4f}{m['pr_auc']:10.4f}{m['far']:10.4f}"
     )
 
 

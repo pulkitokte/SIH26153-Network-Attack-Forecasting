@@ -1,0 +1,4 @@
+episode_id,flow_start,flow_end,ddos_flows,attack_start
+19,36000,37999,1000,37000
+20,38000,39999,1000,39000
+21,40000,41999,1000,41000

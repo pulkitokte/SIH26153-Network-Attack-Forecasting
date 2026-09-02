@@ -16,14 +16,21 @@ Predictions : multihorizon_gru_test_predictions.csv
   Columns : ['window_id', 'episode_id', 'observation_start_position', 'observation_end_position', 'target_50', 'target_100', 'target_200', 'target_500', 'probability_50', 'probability_100', 'probability_200', 'probability_500', 'prediction_50', 'prediction_100', 'prediction_200', 'prediction_500']
   Episodes in prediction CSV: [np.int64(19), np.int64(20), np.int64(21)]
 
-Features    : ddos_features_v1.csv
-  Using Label, episode_id, sequence_position only.
+Validating saved predictions against fixed validation thresholds...
+  50-flow threshold 0.30: prediction column matches probability cutoff
+  100-flow threshold 0.55: prediction column matches probability cutoff
+  200-flow threshold 0.45: prediction column matches probability cutoff
+  500-flow threshold 0.35: prediction column matches probability cutoff
+
+Temporal metadata : test_episode_temporal_metadata.csv
+  Loaded verified source-derived TEST episode metadata.
+  ddos_features_v1.csv is not required.
 
 ===========================================================================
-ATTACK START POSITIONS (SOURCE FEATURES)
+ATTACK START POSITIONS (TEST TEMPORAL METADATA)
 ===========================================================================
 
-Attack start = first DDoS sequence_position in the episode.
+Attack-start positions are loaded from the verified source-derived TEST temporal metadata.
 
 Episode 19:
   Flow range     : 36000 .. 37999
@@ -151,13 +158,13 @@ Observation windows: 40000-40999 (901 windows)
 
 These metrics describe window-level DDoS detection.
 They are NOT lead-time / early-warning metrics.
-Copied from the already-trained model evaluation.
+Metrics are computed directly from the saved TEST prediction CSV using the existing validation-selected thresholds.
 
-Horizon         F1    Recall      Prec   ROC-AUC    PR-AUC       FAR
-50          0.4093    1.0000    0.2573    0.9455    0.3681    0.1696
-100         0.6577    0.9833    0.4941    0.9492    0.7019    0.1257
-200         0.7927    0.8317    0.7572    0.9225    0.7726    0.0761
-500         0.7151    1.0000    0.5566    0.7644    0.8423    0.9933
+Horizon         F1    Recall      Prec       Acc   ROC-AUC    PR-AUC       FAR
+50          0.4093    1.0000    0.2573    0.8398    0.9455    0.3681    0.1696
+100         0.6577    0.9833    0.4941    0.8864    0.9492    0.7019    0.1257
+200         0.7927    0.8317    0.7572    0.9034    0.9225    0.7726    0.0761
+500         0.7151    1.0000    0.5566    0.5579    0.7644    0.8423    0.9933
 
 ===========================================================================
 2. TEMPORAL EARLY-WARNING PERFORMANCE (TEST EPISODES)
@@ -268,8 +275,8 @@ Horizon     Episodes Warned  Warning Rate   Mean Lead  Median Lead  >=50 Flow Su
 SAVED OUTPUTS
 ===========================================================================
 
-Results : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\processed\multihorizon_early_warning_results.csv
-Report  : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\reports\multihorizon_early_warning_report.txt
+Results : C:\Users\Pulkit Okte\Projects\SIH26153-Network-Attack-Forecasting\ml\processed\multihorizon_early_warning_results.csv
+Report  : C:\Users\Pulkit Okte\Projects\SIH26153-Network-Attack-Forecasting\ml\reports\multihorizon_early_warning_report.txt
 
 Existing predictions, tensors, models, and reports were not modified.
 
