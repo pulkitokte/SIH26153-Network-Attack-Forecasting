@@ -1,0 +1,126 @@
+===========================================================================
+CICIDS2017 - COMPLETE LABEL INVENTORY
+===========================================================================
+
+
+---------------------------------------------------------------------------
+FILE: Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 225,745
+
+Labels:
+  DDoS                                     128,027 ( 56.71%)
+  BENIGN                                    97,718 ( 43.29%)
+
+---------------------------------------------------------------------------
+FILE: Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 286,467
+
+Labels:
+  PortScan                                 158,930 ( 55.48%)
+  BENIGN                                   127,537 ( 44.52%)
+
+---------------------------------------------------------------------------
+FILE: Friday-WorkingHours-Morning.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 191,033
+
+Labels:
+  BENIGN                                   189,067 ( 98.97%)
+  Bot                                        1,966 (  1.03%)
+
+---------------------------------------------------------------------------
+FILE: Monday-WorkingHours.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 529,918
+
+Labels:
+  BENIGN                                   529,918 (100.00%)
+
+---------------------------------------------------------------------------
+FILE: Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 288,602
+
+Labels:
+  BENIGN                                   288,566 ( 99.99%)
+  Infiltration                                  36 (  0.01%)
+
+---------------------------------------------------------------------------
+FILE: Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 170,366
+
+Labels:
+  BENIGN                                   168,186 ( 98.72%)
+  Web Attack � Brute Force                   1,507 (  0.88%)
+  Web Attack � XSS                             652 (  0.38%)
+  Web Attack � Sql Injection                    21 (  0.01%)
+
+---------------------------------------------------------------------------
+FILE: Tuesday-WorkingHours.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 445,909
+
+Labels:
+  BENIGN                                   432,074 ( 96.90%)
+  FTP-Patator                                7,938 (  1.78%)
+  SSH-Patator                                5,897 (  1.32%)
+
+---------------------------------------------------------------------------
+FILE: Wednesday-workingHours.pcap_ISCX.csv
+---------------------------------------------------------------------------
+Rows: 692,703
+
+Labels:
+  BENIGN                                   440,031 ( 63.52%)
+  DoS Hulk                                 231,073 ( 33.36%)
+  DoS GoldenEye                             10,293 (  1.49%)
+  DoS slowloris                              5,796 (  0.84%)
+  DoS Slowhttptest                           5,499 (  0.79%)
+  Heartbleed                                    11 (  0.00%)
+
+
+===========================================================================
+OVERALL CICIDS2017 LABEL DISTRIBUTION
+===========================================================================
+
+Total rows across all files: 2,830,743
+
+BENIGN                                 2,273,097 ( 80.30%)
+DoS Hulk                                 231,073 (  8.16%)
+PortScan                                 158,930 (  5.61%)
+DDoS                                     128,027 (  4.52%)
+DoS GoldenEye                             10,293 (  0.36%)
+FTP-Patator                                7,938 (  0.28%)
+SSH-Patator                                5,897 (  0.21%)
+DoS slowloris                              5,796 (  0.20%)
+DoS Slowhttptest                           5,499 (  0.19%)
+Bot                                        1,966 (  0.07%)
+Web Attack � Brute Force                   1,507 (  0.05%)
+Web Attack � XSS                             652 (  0.02%)
+Infiltration                                  36 (  0.00%)
+Web Attack � Sql Injection                    21 (  0.00%)
+Heartbleed                                    11 (  0.00%)
+
+
+===========================================================================
+UNIQUE LABELS FOUND
+===========================================================================
+
+  - BENIGN
+  - Bot
+  - DDoS
+  - DoS GoldenEye
+  - DoS Hulk
+  - DoS Slowhttptest
+  - DoS slowloris
+  - FTP-Patator
+  - Heartbleed
+  - Infiltration
+  - PortScan
+  - SSH-Patator
+  - Web Attack � Brute Force
+  - Web Attack � Sql Injection
+  - Web Attack � XSS

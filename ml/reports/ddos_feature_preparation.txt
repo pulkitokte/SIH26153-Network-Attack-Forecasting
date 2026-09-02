@@ -1,0 +1,22 @@
+CICIDS2017 - DDoS FEATURE PREPARATION
+===========================================================================
+
+Input rows: 42,000
+Final feature columns: 68
+
+Removed constant columns:
+- Bwd PSH Flags
+- Fwd URG Flags
+- Bwd URG Flags
+- CWE Flag Count
+- Fwd Avg Bytes/Bulk
+- Fwd Avg Packets/Bulk
+- Fwd Avg Bulk Rate
+- Bwd Avg Bytes/Bulk
+- Bwd Avg Packets/Bulk
+- Bwd Avg Bulk Rate
+
+Infinite values were replaced with NaN and median imputation was applied.
+
+Remaining NaN: 0
+Remaining Inf: 0

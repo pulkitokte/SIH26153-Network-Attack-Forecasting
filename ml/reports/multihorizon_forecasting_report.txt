@@ -1,0 +1,34 @@
+CICIDS2017 - MULTI-HORIZON FORECASTING
+===========================================================================
+
+Observation length: 100
+Forecast horizons: [50, 100, 200, 500]
+
+Total windows: 18,921
+
+HORIZON DISTRIBUTION
+---------------------------------------------------------------------------
+
+Next 50 flows:
+  No DDoS: 17,871
+  DDoS: 1,050
+
+Next 100 flows:
+  No DDoS: 16,821
+  DDoS: 2,100
+
+Next 200 flows:
+  No DDoS: 14,721
+  DDoS: 4,200
+
+Next 500 flows:
+  No DDoS: 8,421
+  DDoS: 10,500
+
+
+DATASET SPLIT
+dataset_split
+TRAIN         13515
+VALIDATION     2703
+TEST           2703
+Name: count, dtype: int64

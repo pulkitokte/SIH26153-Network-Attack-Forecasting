@@ -1,0 +1,45 @@
+CICIDS2017 - FORECASTING WINDOW VALIDATION
+===========================================================================
+
+Total windows: 399
+
+Target distribution:
+forecast_contains_ddos
+0    189
+1    210
+Name: count, dtype: int64
+
+Observation attack overlap:
+189 windows
+
+Windows per episode:
+episode_id
+1     19
+2     19
+3     19
+4     19
+5     19
+6     19
+7     19
+8     19
+9     19
+10    19
+11    19
+12    19
+13    19
+14    19
+15    19
+16    19
+17    19
+18    19
+19    19
+20    19
+21    19
+Name: count, dtype: int64
+
+Target distribution by split:
+forecast_contains_ddos    0    1
+dataset_split                   
+TEST                     27   30
+TRAIN                   135  150
+VALIDATION               27   30

@@ -1,0 +1,34 @@
+CICIDS2017 - GRU FORECASTING V2
+===========================================================================
+
+Device: cpu
+Input shape: (1365, 100, 68)
+Hidden size: 96
+GRU layers: 2
+Dropout: 0.3
+Learning rate: 0.0005
+Weight decay: 0.0001
+Best validation loss: 0.233735
+Selected threshold: 0.4000
+Validation F1: 0.8923
+
+TEST RESULTS
+---------------------------------------------------------------------------
+[[215  28]
+ [  0  30]]
+
+              precision    recall  f1-score   support
+
+     No DDoS       1.00      0.88      0.94       243
+        DDoS       0.52      1.00      0.68        30
+
+    accuracy                           0.90       273
+   macro avg       0.76      0.94      0.81       273
+weighted avg       0.95      0.90      0.91       273
+
+ROC-AUC: 0.9329
+PR-AUC: 0.5420
+Precision: 0.5172
+Recall: 1.0000
+F1: 0.6818
+False Alarm Rate: 0.1152

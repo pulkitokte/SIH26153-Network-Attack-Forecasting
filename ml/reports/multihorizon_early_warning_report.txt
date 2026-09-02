@@ -1,0 +1,286 @@
+===========================================================================
+CICIDS2017 - MULTI-HORIZON EARLY-WARNING EVALUATION
+===========================================================================
+
+This script is read-only.
+TEST episodes only: 19, 20, 21
+Thresholds are the existing validation-selected values.
+No model is retrained. No source file is modified.
+
+===========================================================================
+LOAD FILES
+===========================================================================
+
+Predictions : multihorizon_gru_test_predictions.csv
+  Rows    : 2,703
+  Columns : ['window_id', 'episode_id', 'observation_start_position', 'observation_end_position', 'target_50', 'target_100', 'target_200', 'target_500', 'probability_50', 'probability_100', 'probability_200', 'probability_500', 'prediction_50', 'prediction_100', 'prediction_200', 'prediction_500']
+  Episodes in prediction CSV: [np.int64(19), np.int64(20), np.int64(21)]
+
+Features    : ddos_features_v1.csv
+  Using Label, episode_id, sequence_position only.
+
+===========================================================================
+ATTACK START POSITIONS (SOURCE FEATURES)
+===========================================================================
+
+Attack start = first DDoS sequence_position in the episode.
+
+Episode 19:
+  Flow range     : 36000 .. 37999
+  Attack starts  : 37000
+  DDoS flows     : 1,000
+
+Episode 20:
+  Flow range     : 38000 .. 39999
+  Attack starts  : 39000
+  DDoS flows     : 1,000
+
+Episode 21:
+  Flow range     : 40000 .. 41999
+  Attack starts  : 41000
+  DDoS flows     : 1,000
+
+===========================================================================
+EARLY-WARNING DEFINITION
+===========================================================================
+
+A warning is issued after a 100-flow observation window.
+
+first_warning_flow = observation_end_position
+of the earliest TEST window where:
+  prediction == 1
+  AND probability >= validation-selected threshold
+
+This is the last observed flow. Forecast-region flows are
+never used as model observations.
+
+lead_time_flows = attack_start_flow - first_warning_flow
+
+Counted as early warning only if:
+  first_warning_flow < attack_start_flow
+  i.e. lead_time_flows > 0
+
+A warning at the attack-start flow has lead time 0 and is
+NOT counted as a positive-lead-time early warning.
+
+Validation-selected thresholds:
+  50-flow : 0.30
+  100-flow : 0.55
+  200-flow : 0.45
+  500-flow : 0.35
+
+===========================================================================
+PER-EPISODE EARLY WARNING
+===========================================================================
+
+Episode 19
+Attack starts at flow: 37000
+Observation windows: 36000-36999 (901 windows)
+
+50-flow:
+  First warning: 36704
+  Lead time: 296 flows
+  Probability: 0.372099
+
+100-flow:
+  First warning: 36299
+  Lead time: 701 flows
+  Probability: 0.581501
+
+200-flow:
+  First warning: 36283
+  Lead time: 717 flows
+  Probability: 0.468257
+
+500-flow:
+  First warning: 36099
+  Lead time: 901 flows
+  Probability: 0.370240
+
+Episode 20
+Attack starts at flow: 39000
+Observation windows: 38000-38999 (901 windows)
+
+50-flow:
+  First warning: 38798
+  Lead time: 202 flows
+  Probability: 0.321912
+
+100-flow:
+  First warning: 38811
+  Lead time: 189 flows
+  Probability: 0.605310
+
+200-flow:
+  First warning: 38793
+  Lead time: 207 flows
+  Probability: 0.602576
+
+500-flow:
+  First warning: 38099
+  Lead time: 901 flows
+  Probability: 0.392836
+
+Episode 21
+Attack starts at flow: 41000
+Observation windows: 40000-40999 (901 windows)
+
+50-flow:
+  First warning: 40902
+  Lead time: 98 flows
+  Probability: 0.324796
+
+100-flow:
+  First warning: 40902
+  Lead time: 98 flows
+  Probability: 0.623479
+
+200-flow:
+  First warning: 40901
+  Lead time: 99 flows
+  Probability: 0.513186
+
+500-flow:
+  First warning: 40099
+  Lead time: 901 flows
+  Probability: 0.412934
+
+===========================================================================
+1. FORECASTING CLASSIFICATION PERFORMANCE (TEST)
+===========================================================================
+
+These metrics describe window-level DDoS detection.
+They are NOT lead-time / early-warning metrics.
+Copied from the already-trained model evaluation.
+
+Horizon         F1    Recall      Prec   ROC-AUC    PR-AUC       FAR
+50          0.4093    1.0000    0.2573    0.9455    0.3681    0.1696
+100         0.6577    0.9833    0.4941    0.9492    0.7019    0.1257
+200         0.7927    0.8317    0.7572    0.9225    0.7726    0.0761
+500         0.7151    1.0000    0.5566    0.7644    0.8423    0.9933
+
+===========================================================================
+2. TEMPORAL EARLY-WARNING PERFORMANCE (TEST EPISODES)
+===========================================================================
+
+--- 50-flow horizon ---
+Episodes evaluated              : 3
+Episodes warned (lead time > 0) : 3
+Early-warning rate              : 100.00%
+Mean lead time                  : 198.67
+Median lead time                : 202.00
+Minimum lead time               : 98
+Maximum lead time               : 296
+Earliest warning probability    : 0.372099
+Average first-warning probability: 0.339602
+False/no-warning episodes       : 0
+  No warning at all             : 0
+  Warning at/after attack start : 0
+First warnings that were also true-positive forecasts : 0/3
+
+Lead-time success rates:
+  >=  10 flows early : 3/3 (100.00%)
+  >=  50 flows early : 3/3 (100.00%)
+  >= 100 flows early : 2/3 (66.67%)
+  >= 200 flows early : 2/3 (66.67%)
+  >= 500 flows early : 0/3 (0.00%)
+
+--- 100-flow horizon ---
+Episodes evaluated              : 3
+Episodes warned (lead time > 0) : 3
+Early-warning rate              : 100.00%
+Mean lead time                  : 329.33
+Median lead time                : 189.00
+Minimum lead time               : 98
+Maximum lead time               : 701
+Earliest warning probability    : 0.581501
+Average first-warning probability: 0.603430
+False/no-warning episodes       : 0
+  No warning at all             : 0
+  Warning at/after attack start : 0
+First warnings that were also true-positive forecasts : 1/3
+
+Lead-time success rates:
+  >=  10 flows early : 3/3 (100.00%)
+  >=  50 flows early : 3/3 (100.00%)
+  >= 100 flows early : 2/3 (66.67%)
+  >= 200 flows early : 1/3 (33.33%)
+  >= 500 flows early : 1/3 (33.33%)
+
+--- 200-flow horizon ---
+Episodes evaluated              : 3
+Episodes warned (lead time > 0) : 3
+Early-warning rate              : 100.00%
+Mean lead time                  : 341.00
+Median lead time                : 207.00
+Minimum lead time               : 99
+Maximum lead time               : 717
+Earliest warning probability    : 0.468257
+Average first-warning probability: 0.528006
+False/no-warning episodes       : 0
+  No warning at all             : 0
+  Warning at/after attack start : 0
+First warnings that were also true-positive forecasts : 1/3
+
+Lead-time success rates:
+  >=  10 flows early : 3/3 (100.00%)
+  >=  50 flows early : 3/3 (100.00%)
+  >= 100 flows early : 2/3 (66.67%)
+  >= 200 flows early : 2/3 (66.67%)
+  >= 500 flows early : 1/3 (33.33%)
+
+--- 500-flow horizon ---
+Episodes evaluated              : 3
+Episodes warned (lead time > 0) : 3
+Early-warning rate              : 100.00%
+Mean lead time                  : 901.00
+Median lead time                : 901.00
+Minimum lead time               : 901
+Maximum lead time               : 901
+Earliest warning probability    : 0.370240
+Average first-warning probability: 0.392003
+False/no-warning episodes       : 0
+  No warning at all             : 0
+  Warning at/after attack start : 0
+First warnings that were also true-positive forecasts : 0/3
+
+Lead-time success rates:
+  >=  10 flows early : 3/3 (100.00%)
+  >=  50 flows early : 3/3 (100.00%)
+  >= 100 flows early : 3/3 (100.00%)
+  >= 200 flows early : 3/3 (100.00%)
+  >= 500 flows early : 3/3 (100.00%)
+
+===========================================================================
+OPERATIONAL HORIZON COMPARISON
+===========================================================================
+
+This table is temporal early-warning performance, not classification F1.
+
+Horizon     Episodes Warned  Warning Rate   Mean Lead  Median Lead  >=50 Flow Success  >=100 Flow Success  >=200 Flow Success
+-----------------------------------------------------------------------------------------------------------------------------
+50                        3       100.0%       198.7        202.0            100.0%              66.7%              66.7%
+100                       3       100.0%       329.3        189.0            100.0%              66.7%              33.3%
+200                       3       100.0%       341.0        207.0            100.0%              66.7%              66.7%
+500                       3       100.0%       901.0        901.0            100.0%             100.0%             100.0%
+
+===========================================================================
+SAVED OUTPUTS
+===========================================================================
+
+Results : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\processed\multihorizon_early_warning_results.csv
+Report  : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\reports\multihorizon_early_warning_report.txt
+
+Existing predictions, tensors, models, and reports were not modified.
+
+===========================================================================
+MULTI-HORIZON EARLY-WARNING EVALUATION COMPLETE
+===========================================================================
+
+Horizon     Episodes Warned  Warning Rate   Mean Lead  Median Lead  >=50 Flow Success  >=100 Flow Success  >=200 Flow Success
+-----------------------------------------------------------------------------------------------------------------------------
+50                        3       100.0%       198.7        202.0            100.0%              66.7%              66.7%
+100                       3       100.0%       329.3        189.0            100.0%              66.7%              33.3%
+200                       3       100.0%       341.0        207.0            100.0%              66.7%              66.7%
+500                       3       100.0%       901.0        901.0            100.0%             100.0%             100.0%
+===========================================================================

@@ -1,0 +1,17 @@
+CICIDS2017 - GRU V2 EARLY-WARNING EVALUATION
+===========================================================================
+
+Decision threshold: 0.4000
+
+EPISODE RESULTS
+---------------------------------------------------------------------------
+ episode_id  attack_start  warning_position  lead_flows  warning_probability  warned
+         19         36910             36719         191             0.964242       1
+         20         38910             38799         111             0.876439       1
+         21         40910             40909           1             0.415951       1
+
+Early-warning rate: 100.0000%
+Mean lead time: 101.00 flows
+Median lead time: 111.00 flows
+Minimum lead time: 1 flows
+Maximum lead time: 191 flows

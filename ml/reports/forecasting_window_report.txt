@@ -1,0 +1,42 @@
+CICIDS2017 - TEMPORAL FORECASTING WINDOW REPORT
+===========================================================================
+
+Observation window: 100 flows
+Forecast horizon: 100 flows
+
+Total windows: 399
+
+Target definition:
+0 = no DDoS in next 100 flows
+1 = DDoS appears in next 100 flows
+
+Target distribution:
+forecast_contains_ddos
+1    210
+0    189
+Name: count, dtype: int64
+
+Episode distribution:
+episode_id
+1     19
+2     19
+3     19
+4     19
+5     19
+6     19
+7     19
+8     19
+9     19
+10    19
+11    19
+12    19
+13    19
+14    19
+15    19
+16    19
+17    19
+18    19
+19    19
+20    19
+21    19
+Name: count, dtype: int64

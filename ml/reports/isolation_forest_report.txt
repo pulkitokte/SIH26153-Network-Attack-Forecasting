@@ -1,0 +1,26 @@
+CICIDS2017 - ISOLATION FOREST REPORT
+===========================================================================
+
+Training strategy:
+Isolation Forest was fitted ONLY on BENIGN TRAIN flows.
+
+Training BENIGN flows: 15,000
+Number of estimators: 200
+Contamination: 0.05
+
+TEST CONFUSION MATRIX
+[[2925   75]
+ [2544  456]]
+
+TEST CLASSIFICATION REPORT
+              precision    recall  f1-score   support
+
+      BENIGN       0.53      0.97      0.69      3000
+        DDoS       0.86      0.15      0.26      3000
+
+    accuracy                           0.56      6000
+   macro avg       0.70      0.56      0.47      6000
+weighted avg       0.70      0.56      0.47      6000
+
+
+ROC-AUC: 0.6183

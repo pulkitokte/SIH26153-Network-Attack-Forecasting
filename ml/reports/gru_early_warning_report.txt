@@ -1,0 +1,17 @@
+CICIDS2017 - GRU EARLY-WARNING EVALUATION
+===========================================================================
+
+Threshold: 0.65
+Test episodes: 3
+Episodes warned: 3
+Mean lead flows: 104.33
+Median lead flows: 111.00
+Minimum lead flows: 1
+Maximum lead flows: 201
+
+
+Episode details:
+ episode_id  attack_start  early_warning  warning_position  lead_flows  warning_probability
+         19         36910              1             36709         201             0.951720
+         20         38910              1             38799         111             0.968149
+         21         40910              1             40909           1             0.884273

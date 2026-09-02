@@ -1,0 +1,25 @@
+CICIDS2017 - DDoS TEMPORAL FEATURE ANALYSIS
+===========================================================================
+
+Test episodes: 19, 20, 21
+
+Combined test-episode comparison:
+
+                    feature  pre_attack_mean  attack_mean  percentage_change
+             Flow Packets/s     3.625022e+04 1.326744e+02         -99.634004
+               Flow Bytes/s     9.347530e+05 2.431431e+04         -97.398852
+          Total Fwd Packets     2.859000e+00 4.335333e+00          51.638102
+     Total Backward Packets     4.312000e+00 7.820000e-01         -81.864564
+             SYN Flag Count     1.500000e-01 0.000000e+00        -100.000000
+             RST Flag Count     0.000000e+00 0.000000e+00                NaN
+         Packet Length Mean     3.775788e+02 2.022059e+02         -46.446689
+          Packet Length Std     7.958665e+02 4.052536e+02         -49.080198
+              Flow Duration     1.179770e+07 4.508377e+06         -61.785978
+              Fwd Packets/s     3.359970e+04 9.203105e+01         -99.726096
+              Bwd Packets/s     2.650517e+03 4.064333e+01         -98.466588
+Total Length of Fwd Packets     3.575707e+03 2.726067e+01         -99.237615
+Total Length of Bwd Packets     5.798567e+01 1.764284e+03        2942.621452
+        Average Packet Size     4.235197e+02 2.283741e+02         -46.077102
+
+Purpose:
+Determine whether network-flow features show measurable temporal changes before DDoS attack onset.

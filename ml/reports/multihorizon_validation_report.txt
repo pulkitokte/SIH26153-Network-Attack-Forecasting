@@ -1,0 +1,556 @@
+===========================================================================
+CICIDS2017 - MULTI-HORIZON FORECASTING WINDOW VALIDATION
+===========================================================================
+
+This is a read-only validation.
+No dataset, generator, or model file will be modified.
+
+===========================================================================
+LOAD DATASETS
+===========================================================================
+
+Windows file : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\processed\ddos_multihorizon_windows_v1.csv
+Features file: C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\processed\ddos_features_v1.csv
+
+Forecasting dataset
+  Rows    : 18,921
+  Columns : 18
+
+Source feature dataset
+  Rows    : 42,000
+  Columns : 72
+
+Forecasting CSV columns:
+  - window_id
+  - episode_id
+  - observation_start_position
+  - observation_end_position
+  - observation_length
+  - ddos_count_next_50
+  - ddos_next_50
+  - ddos_ratio_next_50
+  - ddos_count_next_100
+  - ddos_next_100
+  - ddos_ratio_next_100
+  - ddos_count_next_200
+  - ddos_next_200
+  - ddos_ratio_next_200
+  - ddos_count_next_500
+  - ddos_next_500
+  - ddos_ratio_next_500
+  - dataset_split
+
+===========================================================================
+SCHEMA VALIDATION
+===========================================================================
+
+Listed required columns vs actual CSV:
+  [PRESENT] window_id
+  [PRESENT] episode_id
+  [PRESENT] observation_start_position
+  [PRESENT] observation_end_position
+  [PRESENT] observation_length
+  [ABSENT]  forecast_start_position
+  [ABSENT]  forecast_end_position
+  [PRESENT] ddos_count_next_50
+  [PRESENT] ddos_next_50
+  [PRESENT] ddos_ratio_next_50
+  [PRESENT] ddos_count_next_100
+  [PRESENT] ddos_next_100
+  [PRESENT] ddos_ratio_next_100
+  [PRESENT] ddos_count_next_200
+  [PRESENT] ddos_next_200
+  [PRESENT] ddos_ratio_next_200
+  [PRESENT] ddos_count_next_500
+  [PRESENT] ddos_next_500
+  [PRESENT] ddos_ratio_next_500
+  [PRESENT] dataset_split
+
+No unexpected extra columns.
+
+NOTE: forecast_start_position and/or forecast_end_position are not stored in the CSV.
+Validation derives them from observation positions instead of inventing stored columns:
+  forecast_start = observation_end_position + 1
+  forecast_end(H) = observation_end_position + H
+    for H in {50, 100, 200, 500}
+[OK] Required columns  Adapted schema: forecast positions are derived, not stored.
+[OK] Source feature columns  Label, episode_id, sequence_position are present.
+
+===========================================================================
+MISSING AND INFINITE VALUES
+===========================================================================
+
+No missing / NaN values in the forecasting dataset.
+[OK] No missing values
+No infinite values in numeric forecasting columns.
+[OK] No infinite values
+
+===========================================================================
+DUPLICATE WINDOWS
+===========================================================================
+Duplicate window_id values              : 0
+Duplicate episode + observation bounds  : 0
+Duplicate complete rows                 : 0
+[OK] No duplicate windows
+
+===========================================================================
+OBSERVATION WINDOW LENGTH
+===========================================================================
+
+observation_length value counts:
+observation_length
+100    18921
+Name: count, dtype: int64
+
+Rows where observation_length != 100: 0
+Rows where (end - start + 1) != 100: 0
+Rows where observation end < start: 0
+[OK] Observation length = 100  Every window stores a 100-flow observation span.
+
+===========================================================================
+FORECAST POSITIONS
+===========================================================================
+
+Derived forecast_start_position = observation_end_position + 1
+  Min forecast start: 100
+  Max forecast start: 41,000
+
+Windows where derived forecast start does not immediately follow observation end: 0
+Windows where observation and forecast would overlap: 0
+[OK] Forecast starts after observation  forecast_start = observation_end_position + 1
+[OK] No observation/forecast overlap  Forecast begins on the next sequence_position.
+
+Derived forecast end positions by horizon:
+  H= 50: end range 149 .. 41,049
+  H=100: end range 199 .. 41,099
+  H=200: end range 299 .. 41,199
+  H=500: end range 599 .. 41,499
+
+===========================================================================
+EPISODE ALLOCATION AND DATASET SPLIT
+===========================================================================
+
+Total windows: 18,921
+
+Unique episode_id values: 21
+Episode IDs: [np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(12), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(17), np.int64(18), np.int64(19), np.int64(20), np.int64(21)]
+
+Windows per episode:
+episode_id
+1     901
+2     901
+3     901
+4     901
+5     901
+6     901
+7     901
+8     901
+9     901
+10    901
+11    901
+12    901
+13    901
+14    901
+15    901
+16    901
+17    901
+18    901
+19    901
+20    901
+21    901
+Name: count, dtype: int64
+
+dataset_split distribution:
+dataset_split
+TRAIN         13515
+VALIDATION     2703
+TEST           2703
+Name: count, dtype: int64
+
+TRAIN:
+  Expected episodes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+  Actual episodes  : [np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(12), np.int64(13), np.int64(14), np.int64(15)]
+
+VALIDATION:
+  Expected episodes: [16, 17, 18]
+  Actual episodes  : [np.int64(16), np.int64(17), np.int64(18)]
+
+TEST:
+  Expected episodes: [19, 20, 21]
+  Actual episodes  : [np.int64(19), np.int64(20), np.int64(21)]
+[OK] Episode split  TRAIN=1-15, VALIDATION=16-18, TEST=19-21
+
+Episodes appearing in more than one split:
+  None
+[OK] No episode overlap
+
+===========================================================================
+SOURCE FEATURE INDEX
+===========================================================================
+
+Source Label values: BENIGN, DDoS
+
+Indexed episodes: 21
+sequence_position is contiguous within every episode.
+
+===========================================================================
+WINDOW LOOKUPS AGAINST SOURCE FEATURES
+===========================================================================
+Scanning every window against processed/ddos_features_v1.csv ...
+
+===========================================================================
+CRITICAL EARLY-WARNING SAFETY CHECK
+===========================================================================
+
+For every forecasting window, the corresponding 100 source rows were inspected using episode_id and sequence_position.
+
+Observation windows containing DDoS: 0
+The expected value is 0.
+[OK] Observation contains zero DDoS  Observation windows containing DDoS: 0
+[OK] No cross-episode windows  Observation and forecast regions stay inside the same episode.
+[OK] Observation stays within episode  Every observation region has 100 in-episode flows.
+[OK] Forecast stays within episode  Every horizon 50/100/200/500 stays inside the episode.
+
+===========================================================================
+HORIZON TARGET VALIDATION
+===========================================================================
+
+--- Horizon 50 ---
+Internal stored-target checks:
+  ddos_count outside 0..50: 0
+  ddos_ratio != ddos_count / 50: 0
+  binary != (ddos_count > 0): 0
+Source-feature recomputation:
+  Stored count != actual future DDoS: 0
+  Positive binary with zero future DDoS: 0
+  Negative binary with future DDoS: 0
+  Forecast region outside episode: 0
+  Forecast region missing flows: 0
+
+Overall binary target distribution:
+ddos_next_50
+0    17871
+1     1050
+Name: count, dtype: int64
+  No DDoS : 17,871
+  DDoS    : 1,050
+[OK] Horizon 50 targets valid  count in 0..50, ratio=count/50, binary=1 iff future DDoS exists
+
+--- Horizon 100 ---
+Internal stored-target checks:
+  ddos_count outside 0..100: 0
+  ddos_ratio != ddos_count / 100: 0
+  binary != (ddos_count > 0): 0
+Source-feature recomputation:
+  Stored count != actual future DDoS: 0
+  Positive binary with zero future DDoS: 0
+  Negative binary with future DDoS: 0
+  Forecast region outside episode: 0
+  Forecast region missing flows: 0
+
+Overall binary target distribution:
+ddos_next_100
+0    16821
+1     2100
+Name: count, dtype: int64
+  No DDoS : 16,821
+  DDoS    : 2,100
+[OK] Horizon 100 targets valid  count in 0..100, ratio=count/100, binary=1 iff future DDoS exists
+
+--- Horizon 200 ---
+Internal stored-target checks:
+  ddos_count outside 0..200: 0
+  ddos_ratio != ddos_count / 200: 0
+  binary != (ddos_count > 0): 0
+Source-feature recomputation:
+  Stored count != actual future DDoS: 0
+  Positive binary with zero future DDoS: 0
+  Negative binary with future DDoS: 0
+  Forecast region outside episode: 0
+  Forecast region missing flows: 0
+
+Overall binary target distribution:
+ddos_next_200
+0    14721
+1     4200
+Name: count, dtype: int64
+  No DDoS : 14,721
+  DDoS    : 4,200
+[OK] Horizon 200 targets valid  count in 0..200, ratio=count/200, binary=1 iff future DDoS exists
+
+--- Horizon 500 ---
+Internal stored-target checks:
+  ddos_count outside 0..500: 0
+  ddos_ratio != ddos_count / 500: 0
+  binary != (ddos_count > 0): 0
+Source-feature recomputation:
+  Stored count != actual future DDoS: 0
+  Positive binary with zero future DDoS: 0
+  Negative binary with future DDoS: 0
+  Forecast region outside episode: 0
+  Forecast region missing flows: 0
+
+Overall binary target distribution:
+ddos_next_500
+0     8421
+1    10500
+Name: count, dtype: int64
+  No DDoS : 8,421
+  DDoS    : 10,500
+[OK] Horizon 500 targets valid  count in 0..500, ratio=count/500, binary=1 iff future DDoS exists
+
+===========================================================================
+TARGET DISTRIBUTIONS BY SPLIT
+===========================================================================
+
+Horizon 50 (ddos_next_50):
+ddos_next_50       0    1
+dataset_split            
+TRAIN          12765  750
+VALIDATION      2553  150
+TEST            2553  150
+  TRAIN       total=13,515  no_ddos=12,765  ddos=750  positive_rate=0.0555
+  VALIDATION  total=2,703  no_ddos=2,553  ddos=150  positive_rate=0.0555
+  TEST        total=2,703  no_ddos=2,553  ddos=150  positive_rate=0.0555
+
+Horizon 100 (ddos_next_100):
+ddos_next_100      0     1
+dataset_split             
+TRAIN          12015  1500
+VALIDATION      2403   300
+TEST            2403   300
+  TRAIN       total=13,515  no_ddos=12,015  ddos=1,500  positive_rate=0.1110
+  VALIDATION  total=2,703  no_ddos=2,403  ddos=300  positive_rate=0.1110
+  TEST        total=2,703  no_ddos=2,403  ddos=300  positive_rate=0.1110
+
+Horizon 200 (ddos_next_200):
+ddos_next_200      0     1
+dataset_split             
+TRAIN          10515  3000
+VALIDATION      2103   600
+TEST            2103   600
+  TRAIN       total=13,515  no_ddos=10,515  ddos=3,000  positive_rate=0.2220
+  VALIDATION  total=2,703  no_ddos=2,103  ddos=600  positive_rate=0.2220
+  TEST        total=2,703  no_ddos=2,103  ddos=600  positive_rate=0.2220
+
+Horizon 500 (ddos_next_500):
+ddos_next_500     0     1
+dataset_split            
+TRAIN          6015  7500
+VALIDATION     1203  1500
+TEST           1203  1500
+  TRAIN       total=13,515  no_ddos=6,015  ddos=7,500  positive_rate=0.5549
+  VALIDATION  total=2,703  no_ddos=1,203  ddos=1,500  positive_rate=0.5549
+  TEST        total=2,703  no_ddos=1,203  ddos=1,500  positive_rate=0.5549
+
+===========================================================================
+FORECAST HORIZON RANGES AND SANITY CHECKS
+===========================================================================
+
+Total forecasting windows: 18,921
+Observation length: 100
+Horizons: [50, 100, 200, 500]
+
+Per-episode observation and forecast ranges:
+
+Episode 01:
+  Windows              : 901
+  Observation start min: 0
+  Observation end max  : 999
+  Derived forecast start range: 100 .. 1000
+  Longest forecast end max (H=500): 1499
+  Source episode max position: 1999
+
+Episode 02:
+  Windows              : 901
+  Observation start min: 2000
+  Observation end max  : 2999
+  Derived forecast start range: 2100 .. 3000
+  Longest forecast end max (H=500): 3499
+  Source episode max position: 3999
+
+Episode 03:
+  Windows              : 901
+  Observation start min: 4000
+  Observation end max  : 4999
+  Derived forecast start range: 4100 .. 5000
+  Longest forecast end max (H=500): 5499
+  Source episode max position: 5999
+
+Episode 04:
+  Windows              : 901
+  Observation start min: 6000
+  Observation end max  : 6999
+  Derived forecast start range: 6100 .. 7000
+  Longest forecast end max (H=500): 7499
+  Source episode max position: 7999
+
+Episode 05:
+  Windows              : 901
+  Observation start min: 8000
+  Observation end max  : 8999
+  Derived forecast start range: 8100 .. 9000
+  Longest forecast end max (H=500): 9499
+  Source episode max position: 9999
+
+Episode 06:
+  Windows              : 901
+  Observation start min: 10000
+  Observation end max  : 10999
+  Derived forecast start range: 10100 .. 11000
+  Longest forecast end max (H=500): 11499
+  Source episode max position: 11999
+
+Episode 07:
+  Windows              : 901
+  Observation start min: 12000
+  Observation end max  : 12999
+  Derived forecast start range: 12100 .. 13000
+  Longest forecast end max (H=500): 13499
+  Source episode max position: 13999
+
+Episode 08:
+  Windows              : 901
+  Observation start min: 14000
+  Observation end max  : 14999
+  Derived forecast start range: 14100 .. 15000
+  Longest forecast end max (H=500): 15499
+  Source episode max position: 15999
+
+Episode 09:
+  Windows              : 901
+  Observation start min: 16000
+  Observation end max  : 16999
+  Derived forecast start range: 16100 .. 17000
+  Longest forecast end max (H=500): 17499
+  Source episode max position: 17999
+
+Episode 10:
+  Windows              : 901
+  Observation start min: 18000
+  Observation end max  : 18999
+  Derived forecast start range: 18100 .. 19000
+  Longest forecast end max (H=500): 19499
+  Source episode max position: 19999
+
+Episode 11:
+  Windows              : 901
+  Observation start min: 20000
+  Observation end max  : 20999
+  Derived forecast start range: 20100 .. 21000
+  Longest forecast end max (H=500): 21499
+  Source episode max position: 21999
+
+Episode 12:
+  Windows              : 901
+  Observation start min: 22000
+  Observation end max  : 22999
+  Derived forecast start range: 22100 .. 23000
+  Longest forecast end max (H=500): 23499
+  Source episode max position: 23999
+
+Episode 13:
+  Windows              : 901
+  Observation start min: 24000
+  Observation end max  : 24999
+  Derived forecast start range: 24100 .. 25000
+  Longest forecast end max (H=500): 25499
+  Source episode max position: 25999
+
+Episode 14:
+  Windows              : 901
+  Observation start min: 26000
+  Observation end max  : 26999
+  Derived forecast start range: 26100 .. 27000
+  Longest forecast end max (H=500): 27499
+  Source episode max position: 27999
+
+Episode 15:
+  Windows              : 901
+  Observation start min: 28000
+  Observation end max  : 28999
+  Derived forecast start range: 28100 .. 29000
+  Longest forecast end max (H=500): 29499
+  Source episode max position: 29999
+
+Episode 16:
+  Windows              : 901
+  Observation start min: 30000
+  Observation end max  : 30999
+  Derived forecast start range: 30100 .. 31000
+  Longest forecast end max (H=500): 31499
+  Source episode max position: 31999
+
+Episode 17:
+  Windows              : 901
+  Observation start min: 32000
+  Observation end max  : 32999
+  Derived forecast start range: 32100 .. 33000
+  Longest forecast end max (H=500): 33499
+  Source episode max position: 33999
+
+Episode 18:
+  Windows              : 901
+  Observation start min: 34000
+  Observation end max  : 34999
+  Derived forecast start range: 34100 .. 35000
+  Longest forecast end max (H=500): 35499
+  Source episode max position: 35999
+
+Episode 19:
+  Windows              : 901
+  Observation start min: 36000
+  Observation end max  : 36999
+  Derived forecast start range: 36100 .. 37000
+  Longest forecast end max (H=500): 37499
+  Source episode max position: 37999
+
+Episode 20:
+  Windows              : 901
+  Observation start min: 38000
+  Observation end max  : 38999
+  Derived forecast start range: 38100 .. 39000
+  Longest forecast end max (H=500): 39499
+  Source episode max position: 39999
+
+Episode 21:
+  Windows              : 901
+  Observation start min: 40000
+  Observation end max  : 40999
+  Derived forecast start range: 40100 .. 41000
+  Longest forecast end max (H=500): 41499
+  Source episode max position: 41999
+
+===========================================================================
+FINAL VALIDATION
+===========================================================================
+
+[OK] Required columns  Adapted schema: forecast positions are derived, not stored.
+[OK] No missing values
+[OK] No infinite values
+[OK] Observation length = 100  Every window stores a 100-flow observation span.
+[OK] Episode split  TRAIN=1-15, VALIDATION=16-18, TEST=19-21
+[OK] No episode overlap
+[OK] Forecast starts after observation  forecast_start = observation_end_position + 1
+[OK] Observation contains zero DDoS  Observation windows containing DDoS: 0
+[OK] Horizon 50 targets valid  count in 0..50, ratio=count/50, binary=1 iff future DDoS exists
+[OK] Horizon 100 targets valid  count in 0..100, ratio=count/100, binary=1 iff future DDoS exists
+[OK] Horizon 200 targets valid  count in 0..200, ratio=count/200, binary=1 iff future DDoS exists
+[OK] Horizon 500 targets valid  count in 0..500, ratio=count/500, binary=1 iff future DDoS exists
+[OK] Forecast stays within episode  Every horizon 50/100/200/500 stays inside the episode.
+
+Additional checks:
+[OK] Source feature columns  Label, episode_id, sequence_position are present.
+[OK] No duplicate windows
+[OK] No observation/forecast overlap  Forecast begins on the next sequence_position.
+[OK] No cross-episode windows  Observation and forecast regions stay inside the same episode.
+[OK] Observation stays within episode  Every observation region has 100 in-episode flows.
+
+---------------------------------------------------------------------------
+Summary: 18 OK, 0 WARNING, 0 FAIL
+
+OVERALL: [OK]
+
+===========================================================================
+VALIDATION COMPLETE
+===========================================================================
