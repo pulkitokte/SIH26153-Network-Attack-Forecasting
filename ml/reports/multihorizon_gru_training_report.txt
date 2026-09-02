@@ -343,9 +343,9 @@ False Alarm Rate  : 0.9933
 SAVED OUTPUTS
 ===========================================================================
 
-Model       : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\models\multihorizon_gru.pt
-Predictions : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\processed\multihorizon_gru_test_predictions.csv
-Report      : C:\SIH_PROJECT\CICIDS2017-Dataset\SIH_PROJECT\MachineLearningCVE_DATA\reports\multihorizon_gru_training_report.txt
+Model       : C:\Users\Pulkit Okte\Projects\SIH26153-Network-Attack-Forecasting\ml\models\multihorizon_gru.pt
+Predictions : C:\Users\Pulkit Okte\Projects\SIH26153-Network-Attack-Forecasting\ml\processed\multihorizon_gru_test_predictions.csv
+Report      : C:\Users\Pulkit Okte\Projects\SIH26153-Network-Attack-Forecasting\ml\reports\multihorizon_gru_training_report.txt
 
 ===========================================================================
 MULTI-HORIZON GRU TRAINING COMPLETE
