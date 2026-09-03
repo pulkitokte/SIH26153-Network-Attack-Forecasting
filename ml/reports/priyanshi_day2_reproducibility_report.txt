@@ -1,0 +1,218 @@
+===========================================================================
+PRIYANSHI - DAY 2 REPRODUCIBILITY & PIPELINE SAFETY REPORT
+===========================================================================
+
+Project:
+SIH26153 - AI based Network Attack Forecasting from Network Traffic Data
+
+Dataset:
+CICIDS2017 - DDoS forecasting working set
+
+Date:
+2026-09-03
+
+
+===========================================================================
+1. REPRODUCIBILITY AUDIT
+===========================================================================
+
+Status: PASS
+
+Training seed:
+  SEED = 42
+
+Deterministic training controls:
+  - NumPy seed configured.
+  - PyTorch seed configured.
+  - CUDA deterministic settings configured when CUDA is available.
+  - Dedicated DataLoader generator seeded with SEED.
+  - Training DataLoader uses shuffle=True with the seeded generator.
+  - Validation DataLoader uses shuffle=False.
+  - Test DataLoader uses shuffle=False.
+
+
+===========================================================================
+2. TEMPORAL SEQUENCE CONSTRUCTION
+===========================================================================
+
+Status: PASS
+
+Feature ordering:
+  features_df sorted by:
+    - episode_id
+    - sequence_position
+
+Random shuffling/random sampling was not found in the
+multi-horizon tensor construction script.
+
+Episode split:
+  TRAIN      = episodes 1-15
+  VALIDATION = episodes 16-18
+  TEST       = episodes 19-21
+
+The tensor-building validation checks verify:
+  - exact TRAIN episode assignment
+  - exact VALIDATION episode assignment
+  - exact TEST episode assignment
+  - no TRAIN/VALIDATION overlap
+  - no TRAIN/TEST overlap
+  - no VALIDATION/TEST overlap
+  - stored dataset_split matches episode assignment
+
+
+===========================================================================
+3. TRAINING INPUT/OUTPUT SAFETY
+===========================================================================
+
+Status: PASS
+
+Training script loads existing tensors and metadata.
+
+It does not:
+  - regenerate forecasting windows
+  - modify source CSV files
+  - modify existing tensors
+  - change episode splits
+  - train Isolation Forest
+
+Expected tensor shapes:
+  TRAIN      = (13515, 100, 68)
+  VALIDATION = (2703, 100, 68)
+  TEST       = (2703, 100, 68)
+
+Output artifacts:
+  models/multihorizon_gru.pt
+  processed/multihorizon_gru_test_predictions.csv
+  reports/multihorizon_gru_training_report.txt
+
+Existing output artifacts are overwritten rather than appended,
+preventing duplicate-row accumulation on normal reruns.
+
+The tensor-building script saves outputs only after its validation
+checks pass.
+
+
+===========================================================================
+4. DATA SPLIT / THRESHOLD SAFETY
+===========================================================================
+
+Status: PASS
+
+Positive-class weights are computed from TRAIN only.
+
+Thresholds are selected from VALIDATION only.
+
+TEST data is not used for:
+  - training
+  - threshold selection
+
+TEST is evaluated once after validation threshold selection.
+
+
+===========================================================================
+5. CONTROLLED REPRODUCIBILITY RERUN
+===========================================================================
+
+Status: PASS
+
+The multi-horizon GRU training script was rerun using the same
+existing tensors and configuration.
+
+Observed configuration:
+  Device      = CPU
+  Seed        = 42
+  Batch size  = 64
+  Hidden size = 96
+  GRU layers  = 2
+  Dropout     = 0.30
+  Learning rate = 0.001
+  Max epochs  = 60
+  Patience    = 8
+  Gradient clipping = 1.0
+  Horizons    = 50, 100, 200, 500
+
+Observed training behavior:
+  Best epoch = 1
+  Best validation loss = 1.895873
+  Early stopping triggered at epoch 9
+
+
+===========================================================================
+6. REPRODUCIBILITY RESULTS
+===========================================================================
+
+Status: PASS
+
+The rerun reproduced the previously observed model behavior and
+final TEST metrics exactly.
+
+Final TEST metrics:
+
+  50-flow:
+    F1        = 0.4093
+    ROC-AUC   = 0.9455
+    PR-AUC    = 0.3681
+    FAR       = 0.1696
+
+  100-flow:
+    F1        = 0.6577
+    ROC-AUC   = 0.9492
+    PR-AUC    = 0.7019
+    FAR       = 0.1257
+
+  200-flow:
+    F1        = 0.7927
+    ROC-AUC   = 0.9225
+    PR-AUC    = 0.7726
+    FAR       = 0.0761
+
+  500-flow:
+    F1        = 0.7151
+    ROC-AUC   = 0.7644
+    PR-AUC    = 0.8423
+    FAR       = 0.9933
+
+
+===========================================================================
+7. BYTE-LEVEL ARTIFACT VERIFICATION
+===========================================================================
+
+Status: PASS
+
+SHA-256 hashes captured before the controlled rerun and after the
+controlled rerun were identical.
+
+Model:
+  88e354922577f9f5076a7416d682c47a81c626262071d34044f585f233f78019
+
+Test predictions:
+  dc5692fd425338772a4feed08b86d2bd10ea4507205888391d88bfafbd360ab8
+
+Training report:
+  dd6731c1d7e91e5d3479c62973098f82ff3e5795265939cd3e5ee583497c619b
+
+Therefore the generated artifacts were byte-for-byte identical
+across the controlled rerun.
+
+
+===========================================================================
+8. FINAL CONCLUSION
+===========================================================================
+
+PRIYANSHI DAY 2 REPRODUCIBILITY AUDIT: PASS
+
+The multi-horizon GRU pipeline has verified deterministic seed/control
+configuration, deterministic temporal sequence ordering, fixed
+episode-wise dataset splits, safe artifact generation, validation-only
+threshold selection, and successful controlled rerun reproducibility.
+
+The model checkpoint, test prediction artifact, and training report
+were reproduced with identical SHA-256 hashes.
+
+No source dataset or existing tensor artifact was intentionally
+modified during the reproducibility audit.
+
+
+===========================================================================
+END OF REPORT
+===========================================================================
