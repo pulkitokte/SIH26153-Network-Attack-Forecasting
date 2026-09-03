@@ -1,0 +1,812 @@
+SIH26153 - PRIYANSHI DAY 3
+REPRODUCIBILITY & AUTOMATION AUDIT
+=======================================================================
+
+Project:
+SIH26153 - AI based Network Attack Forecasting from Network Traffic Data
+
+Audit Role:
+Priyanshi - Reproducibility & Automation
+
+Audit Scope:
+ML data preparation, forecasting-window generation, tensor construction,
+validation gates, GRU training, artifact generation, dependency setup,
+dataset setup, and repository-level reproducibility.
+
+Audit Status:
+DAY 3 AUDIT COMPLETE
+
+
+=======================================================================
+1. AUDIT OBJECTIVE
+=======================================================================
+
+The purpose of this audit is to determine whether the current SIH26153
+machine-learning workflow is deterministic, validation-safe, reproducible,
+and suitable for future automation.
+
+The audit distinguishes between:
+
+1. Internal pipeline reproducibility:
+   Whether the existing scripts behave deterministically and protect
+   against known data/integrity failures.
+
+2. Fresh-clone reproducibility:
+   Whether a new user can clone the repository and reproduce the complete
+   ML workflow without relying on undocumented project knowledge.
+
+The audit intentionally does not introduce code changes merely because
+a check is absent from an individual script when an upstream or dedicated
+validation stage already provides the required protection.
+
+
+=======================================================================
+2. CURRENT END-TO-END ML PIPELINE
+=======================================================================
+
+The verified current pipeline is:
+
+CICIDS2017 raw DDoS CSV
+        |
+        v
+create_ddos_working_set.py
+        |
+        v
+validate_ddos_working_set.py
+        |
+        v
+prepare_ddos_features.py
+        |
+        v
+create_multihorizon_forecasting_windows.py
+        |
+        v
+validate_multihorizon_windows.py
+        |
+        v
+build_multihorizon_sequence_tensors.py
+        |
+        v
+validate_multihorizon_sequence_tensors.py
+        |
+        v
+train_multihorizon_gru.py
+        |
+        +----> multihorizon_gru.pt
+        |
+        +----> multihorizon_gru_test_predictions.csv
+        |
+        +----> multihorizon_gru_training_report.txt
+
+
+=======================================================================
+3. SCRIPT-BY-SCRIPT AUDIT
+=======================================================================
+
+3.1 create_ddos_working_set.py
+--------------------------------
+
+Status: PASS WITH DOCUMENTATION GAP
+
+Verified behavior:
+
+- Uses repository-relative paths.
+- Reads the CICIDS2017 DDoS source CSV.
+- Creates the processed DDoS working dataset.
+- Uses contiguous DDoS runs.
+- Applies the configured episode-selection logic.
+- Produces episode, phase, and sequence-position metadata.
+- Does not rely on absolute machine-specific paths.
+
+Current repository limitation:
+
+- The raw CICIDS2017 dataset is not committed to Git.
+- The generated working dataset is also not committed.
+
+Interpretation:
+
+The generation logic is reproducible when the required source dataset is
+available, but a fresh clone requires documented dataset acquisition and
+placement instructions.
+
+
+3.2 validate_ddos_working_set.py
+--------------------------------
+
+Status: INFORMATIONAL VALIDATION
+
+Verified behavior:
+
+- Checks required columns.
+- Reports continuity issues.
+- Reports missing values and other dataset properties.
+- Does not modify the source dataset.
+- Does not currently terminate execution through a hard failure for every
+  validation finding.
+
+Important distinction:
+
+This validator is report-oriented rather than a complete hard gate.
+
+Therefore it should be treated as an informational audit stage unless
+its failure behavior is intentionally strengthened in a future hardening
+pass.
+
+
+3.3 prepare_ddos_features.py
+----------------------------
+
+Status: PASS
+
+Verified behavior:
+
+- Required-column failures raise ValueError.
+- Infinite values are detected.
+- Infinity is converted to NaN.
+- Missing feature values are identified.
+- Median imputation is applied.
+- Constant columns are identified and removed.
+- Remaining NaN values are explicitly checked.
+- Remaining infinite values are explicitly checked.
+- Remaining NaN or Inf values cause ValueError.
+- Output CSV is written only after successful preprocessing checks.
+
+Interpretation:
+
+This stage has appropriate hard-failure behavior for the critical
+preprocessing integrity conditions.
+
+
+3.4 create_multihorizon_forecasting_windows.py
+-----------------------------------------------
+
+Status: PASS WITH DOCUMENTATION NOTE
+
+Verified behavior:
+
+- Invalid episode-to-split assignment raises ValueError.
+- Empty generated windows raise ValueError.
+- Observation windows are explicitly checked for DDoS contamination.
+- Any DDoS inside an observation window causes ValueError.
+- Horizon target distributions are reported.
+- Dataset split distributions are reported.
+- Windows-per-episode distributions are reported.
+- Output is saved after the embedded safety checks.
+- A reproducibility report is generated.
+- The original prepared dataset is not modified.
+
+Important distinction:
+
+Horizon distributions, split distributions, and episode counts are
+reported but are not themselves hard-fail assertions in this section.
+
+Structural integrity is additionally protected by the dedicated
+validate_multihorizon_windows.py stage.
+
+
+3.5 validate_multihorizon_windows.py
+------------------------------------
+
+Status: HARD VALIDATION GATE
+
+Verified project behavior:
+
+- Dedicated validation stage exists.
+- It is used after forecasting-window generation.
+- Critical structural failures terminate validation rather than being
+  treated only as informational output.
+
+Interpretation:
+
+This stage provides the primary structural hard gate for generated
+forecasting windows.
+
+
+3.6 build_multihorizon_sequence_tensors.py
+-------------------------------------------
+
+Status: PASS - STRONG VALIDATION GATE
+
+Verified behavior:
+
+- Expected feature selection is checked.
+- Forecast target and metadata columns are excluded from X.
+- Expected feature count is enforced.
+- Sequence construction validates expected observation structure.
+- Each sequence must have shape:
+  (100, 68)
+- X NaN count must be zero.
+- X Inf count must be zero.
+- Train/validation/test X shapes are checked.
+- Every horizon y shape is checked.
+- X and y sample counts must match.
+- Every target must contain only 0/1.
+- Full X shape is checked.
+- Metadata row count must equal total windows.
+- forecast_start_position must equal observation_end_position + 1.
+- Observation length must equal 100 flows.
+- Stored dataset split must match episode assignment.
+- TRAIN episodes must equal 1-15.
+- VALIDATION episodes must equal 16-18.
+- TEST episodes must equal 19-21.
+- Train/validation/test episode overlap is explicitly checked.
+
+Most important safety property:
+
+If any validation check fails, the script raises RuntimeError and
+explicitly prevents tensor files from being written.
+
+Therefore:
+
+VALIDATION FAILURE
+        |
+        v
+FAIL
+        |
+        v
+NO TENSOR FILES WRITTEN
+
+
+3.7 validate_multihorizon_sequence_tensors.py
+---------------------------------------------
+
+Status: HARD VALIDATION GATE
+
+Verified project behavior:
+
+- Dedicated tensor validation stage exists.
+- It checks tensor integrity after construction.
+- Critical failures terminate validation.
+
+Interpretation:
+
+Tensor generation is protected both internally and by a dedicated
+validation stage.
+
+
+3.8 train_multihorizon_gru.py
+-----------------------------
+
+Status: PASS WITH HARDENING OBSERVATION
+
+Verified behavior:
+
+- Expected X shapes are checked.
+- y sample counts are checked against X.
+- TEST metadata row count is checked against X_test.
+- TRAIN-only positive-class weights are calculated.
+- Zero-positive training horizons cause ValueError.
+- Training DataLoader uses deterministic seeded shuffling.
+- Validation and test DataLoaders use shuffle=False.
+- Best model is selected using validation loss.
+- Best validation checkpoint is restored before final evaluation.
+- Validation predictions are used for threshold selection.
+- Thresholds are selected using validation F1 only.
+- TEST data is explicitly excluded from threshold selection.
+- TEST is evaluated after validation threshold selection.
+- Missing checkpoint causes RuntimeError.
+- Model checkpoint stores architecture, thresholds, validation F1,
+  positive weights, seed, and training hyperparameters.
+- Prediction row count is checked against X_test.
+- Test metadata targets are cross-checked against tensor targets.
+- Final report records test metrics.
+- Final report records that TEST was not used during training or
+  threshold selection.
+
+Hardening observation:
+
+The training script itself does not independently check loaded tensors
+for NaN/Inf.
+
+This is not a current end-to-end pipeline failure because the upstream
+tensor-builder already performs an explicit NaN/Inf hard gate before
+creating the training tensors.
+
+Recommendation:
+
+An independent finite-value check may be added to the training script
+in a future hardening pass if standalone execution is expected.
+
+
+=======================================================================
+4. REPRODUCIBILITY CONTROLS
+=======================================================================
+
+The current workflow contains the following verified controls:
+
+- Fixed random seed.
+- Deterministic training configuration.
+- Seeded DataLoader shuffling.
+- Fixed episode-based dataset split.
+- No train/validation/test episode overlap.
+- TRAIN-only class-weight calculation.
+- Validation-only threshold selection.
+- TEST isolation from threshold selection.
+- Best-model selection using validation loss.
+- Explicit sequence dimensions.
+- Explicit feature count.
+- Explicit target dimensions.
+- Explicit metadata alignment checks.
+- Dedicated validation stages.
+- Controlled rerun behavior.
+- Previously verified reproducibility rerun produced matching artifacts
+  under the audited workflow.
+
+These controls provide strong internal reproducibility.
+
+
+=======================================================================
+5. DATA SPLIT AND LEAKAGE CONTROL
+=======================================================================
+
+The authoritative episode split is:
+
+TRAIN:
+Episodes 1-15
+
+VALIDATION:
+Episodes 16-18
+
+TEST:
+Episodes 19-21
+
+The split is episode-based rather than randomly mixing windows from
+the same episode across train, validation, and test.
+
+The tensor-builder explicitly checks:
+
+- TRAIN = 1-15
+- VALIDATION = 16-18
+- TEST = 19-21
+- No TRAIN/VALIDATION overlap
+- No TRAIN/TEST overlap
+- No VALIDATION/TEST overlap
+
+The observation/forecast boundary is also checked:
+
+forecast_start_position =
+observation_end_position + 1
+
+Observation length:
+
+100 flows
+
+This is a critical control for the forecasting formulation.
+
+
+=======================================================================
+6. ARTIFACT AND GITIGNORE STRATEGY
+=======================================================================
+
+The repository intentionally excludes generated and large artifacts.
+
+Verified .gitignore entries include:
+
+- ml/raw/
+- ml/data/raw/
+- *.npy
+- *.pt
+- *.joblib
+- ml/processed/
+- __pycache__/
+- .venv/
+- venv/
+
+This is appropriate repository hygiene because raw datasets, generated
+tensors, and model binaries should not unnecessarily be committed.
+
+However, this means fresh-clone reproduction requires explicit
+instructions for obtaining the raw dataset and regenerating ignored
+artifacts.
+
+
+=======================================================================
+7. PYTHON ENVIRONMENT FINDINGS
+=======================================================================
+
+No Python dependency manifest was found.
+
+The repository currently contains no:
+
+- requirements.txt
+- requirements-*.txt
+- pyproject.toml
+- environment.yml
+- environment.yaml
+- Pipfile
+- setup.py
+- setup.cfg
+
+The currently used environment was inspected during the audit.
+
+Relevant installed versions observed during the audit included:
+
+- Python 3.13.15
+- NumPy 2.5.2
+- pandas 3.0.5
+- PyTorch 2.13.0+cpu
+- scikit-learn 1.9.0
+- joblib 1.6.0
+- FastAPI 0.141.1
+- Pydantic 2.13.5
+- ReportLab 5.0.1
+- Uvicorn 0.52.4
+
+These versions describe the audited machine environment.
+
+They are not currently pinned or declared by the repository.
+
+Finding:
+
+FRESH-CLONE ENVIRONMENT REPRODUCIBILITY = GAP
+
+
+=======================================================================
+8. ENVIRONMENT VARIABLE FINDING
+=======================================================================
+
+The repository-wide search found no current usage of:
+
+- os.environ
+- os.getenv
+- load_dotenv
+- dotenv
+- process.env
+- import.meta.env
+
+Therefore the absence of .env.example is not currently an ML
+reproducibility blocker.
+
+The .gitignore explicitly permits .env.example, but no .env.example
+file currently exists.
+
+No .env.example file should be added solely for audit completeness
+unless actual environment variables are introduced later.
+
+
+=======================================================================
+9. DATASET SETUP FINDING
+=======================================================================
+
+The CICIDS2017 raw dataset is not committed to the repository.
+
+The expected raw input is the CICIDS2017 DDoS dataset CSV used by the
+working-set generation stage.
+
+The repository currently lacks a clear fresh-clone instruction set
+covering:
+
+1. Where to obtain the CICIDS2017 source data.
+2. Which source CSV is required.
+3. Where the CSV should be placed.
+4. Which script should be run first.
+5. Which validation stage follows each generation stage.
+6. How generated tensors are produced.
+7. How the GRU training stage is executed.
+
+Finding:
+
+DATASET REPRODUCIBILITY = DOCUMENTATION GAP
+
+
+=======================================================================
+10. AUTOMATION / ORCHESTRATION FINDING
+=======================================================================
+
+No central end-to-end automation runner was found.
+
+No obvious:
+
+- run_pipeline.py
+- train_all.py
+- pipeline.py
+- automation runner
+- equivalent ML orchestration script
+
+was found in the repository.
+
+The actual dependency chain currently has to be known by the operator.
+
+Verified conceptual order:
+
+1. create_ddos_working_set.py
+2. validate_ddos_working_set.py
+3. prepare_ddos_features.py
+4. create_multihorizon_forecasting_windows.py
+5. validate_multihorizon_windows.py
+6. build_multihorizon_sequence_tensors.py
+7. validate_multihorizon_sequence_tensors.py
+8. train_multihorizon_gru.py
+
+Finding:
+
+END-TO-END AUTOMATION = GAP
+
+
+=======================================================================
+11. README / USER-FACING REPRODUCIBILITY FINDING
+=======================================================================
+
+The current README does not provide a complete ML setup and execution
+guide.
+
+A fresh user cannot currently determine from README alone:
+
+- required Python version
+- required Python packages
+- dataset acquisition
+- dataset placement
+- ML pipeline execution order
+- validation checkpoints
+- training command
+- generated artifact locations
+
+Finding:
+
+FRESH-CLONE USER EXPERIENCE = DOCUMENTATION GAP
+
+
+=======================================================================
+12. IMPORTANT DISTINCTION: INTERNAL VS FRESH-CLONE REPRODUCIBILITY
+=======================================================================
+
+The audit concludes that these are two different states.
+
+INTERNAL PIPELINE REPRODUCIBILITY:
+PASS
+
+The existing scripts contain strong deterministic controls, explicit
+validation, fixed splits, leakage protection, and controlled training
+behavior.
+
+FRESH-CLONE REPRODUCIBILITY:
+PARTIAL / GAP
+
+A new user still requires undocumented knowledge about:
+
+- dependencies
+- dataset acquisition
+- dataset placement
+- execution sequence
+- generated artifacts
+
+Therefore the project should not claim that the repository is currently
+"one-command reproducible" or "fresh-clone reproducible."
+
+
+=======================================================================
+13. CURRENT VALIDATION-GATE MATRIX
+=======================================================================
+
+Stage                                      Status
+
+Working-set generation                     PASS
+Working-set validation                     INFORMATIONAL
+Feature preparation                        PASS / HARD FAILURE
+Forecast-window generation                 PASS / EMBEDDED SAFETY
+Forecast-window validation                 PASS / HARD GATE
+Tensor generation                          PASS / HARD GATE
+Tensor validation                          PASS / HARD GATE
+GRU training                               PASS
+Validation-only thresholds                 PASS
+TEST isolation                             PASS
+Artifact generation                        PASS
+
+
+=======================================================================
+14. REPRODUCIBILITY RISK CLASSIFICATION
+=======================================================================
+
+LOW RISK:
+- Random seed control
+- Episode split leakage
+- Test threshold leakage
+- Tensor shape integrity
+- NaN/Inf handling in tensor construction
+- Target binary integrity
+- Metadata/tensor alignment
+- Model checkpoint selection
+
+MEDIUM RISK / HARDENING:
+- Standalone GRU training lacks independent NaN/Inf check.
+- Working-set validator is informational rather than a hard gate.
+- Window generator reports several distributions rather than enforcing
+  all of them as hard assertions.
+
+HIGHER REPRODUCIBILITY RISK:
+- No dependency manifest.
+- No dataset setup guide.
+- No end-to-end orchestration runner.
+- README does not provide a complete ML reproduction workflow.
+
+
+=======================================================================
+15. RECOMMENDED HARDENING ACTIONS
+=======================================================================
+
+Priority 1 - Dependency manifest
+
+Add a Python dependency manifest containing the required runtime
+packages and appropriate version constraints.
+
+Purpose:
+
+Allow a fresh environment to install the required Python dependencies
+without relying on Pulkit's current machine.
+
+Suggested scope should cover the packages actually imported by the
+current Python project, including ML and backend dependencies where
+appropriate.
+
+
+Priority 2 - Dataset setup documentation
+
+Add clear instructions describing:
+
+- CICIDS2017 source dataset
+- Required DDoS CSV
+- Expected directory
+- Expected filename
+- Raw dataset is intentionally Git-ignored
+- First pipeline command
+
+
+Priority 3 - End-to-end reproducibility runner
+
+Create a central ML pipeline runner that executes the verified stages
+in the correct order and stops immediately when a hard validation stage
+fails.
+
+The runner should not duplicate preprocessing/training logic.
+
+It should orchestrate existing scripts rather than replacing them.
+
+
+Priority 4 - README reproduction section
+
+Document:
+
+- Python version
+- environment creation
+- dependency installation
+- dataset placement
+- pipeline execution order
+- generated artifacts
+- validation gates
+- training command
+- expected final outputs
+
+
+Priority 5 - Optional standalone training hardening
+
+Add explicit finite-value validation to train_multihorizon_gru.py so
+that direct standalone training also rejects NaN/Inf inputs.
+
+This is optional because the current upstream tensor builder already
+provides the required end-to-end protection.
+
+
+Priority 6 - Optional working-set validation hardening
+
+Evaluate whether validate_ddos_working_set.py should become a true hard
+gate for critical structural failures.
+
+Do not change this automatically without deciding which findings are
+critical enough to block the pipeline.
+
+
+=======================================================================
+16. CHANGES NOT JUSTIFIED BY THIS AUDIT
+=======================================================================
+
+The following should NOT be changed merely for cosmetic reasons:
+
+- Do not alter the current train/validation/test episode split.
+- Do not tune thresholds using TEST data.
+- Do not modify H500 threshold solely to improve test FAR.
+- Do not commit raw CICIDS2017 data.
+- Do not commit generated .npy tensors unnecessarily.
+- Do not commit trained .pt model binaries unnecessarily.
+- Do not add .env.example without actual environment-variable usage.
+- Do not duplicate existing preprocessing or validation logic inside
+  a future runner.
+- Do not weaken existing validation gates for convenience.
+
+
+=======================================================================
+17. H500 REPRODUCIBILITY NOTE
+=======================================================================
+
+The H500 operating-point behavior was separately investigated.
+
+The H500 test result shows genuine ranking signal but poor operating-point
+behavior under the threshold selected from validation F1.
+
+The threshold was selected from VALIDATION only.
+
+Therefore the poor H500 test FAR must not be "fixed" by tuning against
+the TEST set.
+
+The current defensible interpretation is:
+
+- H50/H100/H200 are stronger operational forecasting horizons.
+- H500 should currently be treated as a longer-range exploratory or
+  research forecasting output.
+- The limitation should be reported honestly.
+- No cosmetic metric manipulation should be performed.
+
+
+=======================================================================
+18. FINAL PRIYANSHI DAY 3 AUDIT CONCLUSION
+=======================================================================
+
+The SIH26153 ML pipeline is technically much more reproducible than a
+simple collection of scripts.
+
+It contains:
+
+- deterministic controls
+- fixed episode splits
+- leakage protection
+- train-only weighting
+- validation-only thresholds
+- test isolation
+- multiple validation stages
+- tensor integrity gates
+- metadata alignment checks
+- controlled model checkpointing
+- reproducible prediction artifacts
+
+Therefore:
+
+INTERNAL ML REPRODUCIBILITY = PASS
+
+However, repository-level fresh-clone reproducibility is incomplete
+because the project currently lacks:
+
+- a Python dependency manifest
+- complete dataset setup documentation
+- complete README execution instructions
+- a central end-to-end automation runner
+
+Therefore:
+
+FRESH-CLONE REPRODUCIBILITY = PARTIAL / HARDENING REQUIRED
+
+
+=======================================================================
+19. PRIYANSHI DAY 3 STATUS
+=======================================================================
+
+Role:
+Reproducibility & Automation Audit
+
+Audit:
+100% COMPLETE
+
+Audit outcome:
+
+INTERNAL PIPELINE REPRODUCIBILITY
+PASS
+
+FRESH-CLONE REPRODUCIBILITY
+PARTIAL - DOCUMENTATION AND AUTOMATION HARDENING REQUIRED
+
+No unnecessary model or dataset changes are recommended as a result
+of this audit.
+
+Next recommended project action:
+
+Implement repository-level reproducibility hardening through:
+
+1. dependency manifest
+2. dataset setup documentation
+3. README ML reproduction section
+4. central pipeline orchestration
+
+while preserving all existing validation and leakage controls.
+
+
+=======================================================================
+END OF PRIYANSHI DAY 3 AUDIT
+=======================================================================
