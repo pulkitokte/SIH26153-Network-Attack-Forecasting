@@ -2,6 +2,7 @@ import type {
   AlertItem,
   AnalyticsBundle,
   DashboardData,
+  ExplainabilityResponse,
   ModelMetrics,
   MultiHorizonPrediction,
   TimeRange,
@@ -135,6 +136,34 @@ export async function predict(
   }
 
   return response.json() as Promise<MultiHorizonPrediction>;
+}
+
+export async function explain(
+  sequence: number[][],
+  featureIndex: number,
+  timestep: number,
+): Promise<ExplainabilityResponse> {
+  const response = await fetch(`${API_BASE_URL}/explain`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sequence,
+      feature_index: featureIndex,
+      timestep,
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+
+    throw new Error(
+      `Explainability request failed (${response.status}): ${detail}`,
+    );
+  }
+
+  return response.json() as Promise<ExplainabilityResponse>;
 }
 
 export async function getAlerts(): Promise<AlertItem[]> {

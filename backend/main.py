@@ -5,12 +5,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from ml.inference.multihorizon_gru_explainability import (
+    LocalTemporalFeaturePerturbation,
+)
 from ml.inference.multihorizon_gru_inference import MultiHorizonGRUInference
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_PATH = BASE_DIR / "ml" / "models" / "multihorizon_gru.pt"
 TEST_SEQUENCE_PATH = BASE_DIR / "ml" / "processed" / "multihorizon_X_test.npy"
+TRAIN_TENSOR_PATH = BASE_DIR / "ml" / "processed" / "multihorizon_X_train.npy"
 
 DEMO_TEST_INDEX = 1691
 DEMO_WINDOW_ID = 17909
@@ -33,12 +37,35 @@ app.add_middleware(
 
 
 model = MultiHorizonGRUInference(str(MODEL_PATH))
+explainability_engine = LocalTemporalFeaturePerturbation(
+    checkpoint_path=MODEL_PATH,
+    train_tensor_path=TRAIN_TENSOR_PATH,
+)
 
 
 class PredictRequest(BaseModel):
     sequence: list[list[float]] = Field(
         ...,
         description="Exactly 100 consecutive flow rows with exactly 68 features each.",
+    )
+
+
+class ExplainRequest(BaseModel):
+    sequence: list[list[float]] = Field(
+        ...,
+        description="Exactly 100 consecutive flow rows with exactly 68 features each.",
+    )
+    feature_index: int = Field(
+        ...,
+        ge=0,
+        le=67,
+        description="Feature index from 0 through 67.",
+    )
+    timestep: int = Field(
+        ...,
+        ge=0,
+        le=99,
+        description="Observation timestep from 0 through 99.",
     )
 
 
@@ -54,6 +81,13 @@ def model_status():
         "model": type(model.model).__name__,
         "horizons": model.horizons,
         "thresholds": model.thresholds,
+        "explainability": {
+            "available": True,
+            "method": "Local Temporal Feature Perturbation",
+            "baseline": "TRAIN-only per-feature median",
+            "causal": False,
+            "global_feature_importance": False,
+        },
     }
 
 
@@ -131,5 +165,32 @@ def predict(request: PredictRequest):
 
     try:
         return model.predict(request.sequence)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/explain")
+def explain(request: ExplainRequest):
+    rows = len(request.sequence)
+
+    if rows != 100:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Expected exactly 100 rows, got {rows}",
+        )
+
+    for index, row in enumerate(request.sequence):
+        if len(row) != 68:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Row {index} must contain exactly 68 features, got {len(row)}",
+            )
+
+    try:
+        return explainability_engine.explain(
+            sequence=request.sequence,
+            feature_index=request.feature_index,
+            timestep=request.timestep,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

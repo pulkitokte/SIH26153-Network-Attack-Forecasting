@@ -114,6 +114,25 @@ export interface MultiHorizonPrediction {
   predictions: Record<string, number>;
 }
 
+export type ForecastHorizon = '50' | '100' | '200' | '500';
+
+export interface ExplainabilityResponse {
+  method: string;
+  interpretation: string;
+  feature_index: number;
+  feature_name: string;
+  timestep: number;
+  original_value: number;
+  baseline_value: number;
+  baseline_source: string;
+  original_probabilities: Record<ForecastHorizon, number>;
+  perturbed_probabilities: Record<ForecastHorizon, number>;
+  probability_deltas: Record<ForecastHorizon, number>;
+  absolute_probability_deltas: Record<ForecastHorizon, number>;
+  thresholds: Record<ForecastHorizon, number>;
+  predictions: Record<ForecastHorizon, number>;
+}
+
 export interface ModelComparisonRow {
   model: string;
   accuracy: number;
